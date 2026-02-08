@@ -1,9 +1,5 @@
 name: Create virtual machine
 on:
-  push:
-    branches:
-      - '*'
-  pull_request:
   workflow_dispatch:
     inputs:
       disk-url:
@@ -41,8 +37,6 @@ on:
         description: Arguments to virt-customize to be run on the image
       command:
         description: Command to run in the VM
-  schedule:
-    - cron: '15 3 * * 1'
 
 jobs:
   test-plan:
