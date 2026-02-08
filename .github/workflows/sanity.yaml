@@ -1,8 +1,5 @@
 name: Verify action inputs handling
 on:
-  push:
-    branches:
-      - '*'
   workflow_dispatch:
   schedule:
     - cron: '5 3 * * 1'

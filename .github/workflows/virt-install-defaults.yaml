@@ -1,8 +1,5 @@
 name: Test the action defaults
 on:
-  push:
-    branches:
-      - '*'
   workflow_dispatch:
   schedule:
     - cron: '12 3 * * 1'

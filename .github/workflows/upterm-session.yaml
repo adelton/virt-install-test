@@ -1,0 +1,20 @@
+name: Upterm session
+on:
+  - push
+  - workflow_dispatch
+jobs:
+  upterm-session:
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on:
+          - ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./
+        with:
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
+          osinfo: ubuntu24.04
+      - name: Setup upterm session
+        uses: owenthereal/action-upterm@f26ebc11e22a09b8365f39d2cdafd06f63b42053	# v1.14.0

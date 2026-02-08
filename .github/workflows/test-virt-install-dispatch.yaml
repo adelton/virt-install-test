@@ -1,8 +1,5 @@
 name: Test virt-install workflow dispatch
 on:
-  push:
-    branches:
-      - '*'
   workflow_dispatch:
   schedule:
     - cron: '10 3 * * 1'
