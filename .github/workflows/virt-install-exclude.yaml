@@ -1,8 +1,5 @@
 name: Test failures of excluded combinations
 on:
-  push:
-    branches:
-      - '*'
   workflow_dispatch:
 
 jobs:

@@ -1,8 +1,5 @@
 name: Create virtual machine
 on:
-  push:
-    branches:
-      - '*'
   workflow_dispatch:
     inputs:
       disk-url:

@@ -1,8 +1,5 @@
 name: Retrieve possible osinfo values
 on:
-  push:
-    branches:
-      - '*'
   workflow_dispatch:
   schedule:
     - cron: '6 3 * * 1'
