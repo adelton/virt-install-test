@@ -35,7 +35,7 @@ jobs:
         include: ${{ fromJSON(needs.test-plan.outputs.matrix-run) }}
     steps:
       - uses: actions/checkout@v6
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: ${{ matrix.disk-url }}
           arch: ${{ matrix.arch }}
