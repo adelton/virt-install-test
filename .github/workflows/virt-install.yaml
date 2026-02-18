@@ -1,35 +1,17 @@
 name: Create virtual machine
 on:
-  push:
-    branches:
-      - '*'
-  workflow_dispatch:
-    inputs:
-      disk-url:
-        description: URL of disk to use
-      vm-name:
-        description: Name of the VM (libvirt domain)
-        default: vm1.example.com
-      osinfo:
-        description: The osinfo parameter to virt-install
-        default: generic
-      boot:
-        description: The virt-install --boot argument value
-        default: uefi
-      command:
-        description: Command to run in the VM
-
+  - push
+  - workflow_dispatch
 jobs:
   virt-install-almalinux:
     runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
     steps:
-      - uses: actions/checkout@v6
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
           osinfo: almalinux10
           boot: hd
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/inventory
         with:
           vm-name: vm1.example.com
@@ -54,15 +36,14 @@ jobs:
           condition: secure-boot=yes,enrolled-keys=yes
   virt-install-fedora:
     runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
     steps:
-      - uses: actions/checkout@v6
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2
           vm-name: fedora-42.example.test
           osinfo: fedora42
           boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/inventory
         with:
           vm-name: fedora-42.example.test
@@ -72,7 +53,7 @@ jobs:
           vm-name: fedora-42.example.test
           condition: secure-boot=no,enrolled-keys=no
       - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
           vm-name: fedora-43.example.test
@@ -87,15 +68,14 @@ jobs:
           condition: secure-boot=yes,enrolled-keys=yes
   virt-install-ubuntu:
     runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
     steps:
-      - uses: actions/checkout@v6
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
           vm-name: ubuntu.example.test
           osinfo: ubuntu24.04
       - run: virsh dumpxml ubuntu.example.test
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/inventory
         with:
           vm-name: ubuntu.example.test
@@ -104,7 +84,7 @@ jobs:
         with:
           vm-name: ubuntu.example.test
           condition: secure-boot=yes,enrolled-keys=yes
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
           vm-name: ubuntu-2.example.test
@@ -119,16 +99,15 @@ jobs:
           condition: secure-boot=yes,enrolled-keys=yes
   virt-install-arch-linux:
     runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
     steps:
-      - uses: actions/checkout@v6
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
           vm-name: arch.example.test
           osinfo: archlinux
           boot: hd
       - run: virsh dumpxml arch.example.test
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/inventory
         with:
           vm-name: arch.example.test
@@ -139,7 +118,7 @@ jobs:
           condition: secure-boot=missing,enrolled-keys=missing
       - run: virsh destroy arch.example.test ; virsh undefine arch.example.test
       - run: rm -f ~/.ssh/known_hosts
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
           vm-name: arch.example.test
@@ -150,23 +129,3 @@ jobs:
         with:
           vm-name: arch.example.test
           condition: secure-boot=no,enrolled-keys=no
-
-  virt-install-manual:
-    runs-on: ubuntu-latest
-    if: inputs.disk-url != ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./
-        with:
-          disk-url: ${{ inputs.disk-url }}
-          vm-name: ${{ inputs.vm-name }}
-          osinfo: ${{ inputs.osinfo }}
-          boot: ${{ inputs.boot }}
-      - run: ssh root@'${{ inputs.vm-name }}' "$INPUT_COMMAND"
-        if: inputs.command != ''
-        env:
-          INPUT_COMMAND: ${{ inputs.command }}
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: ${{ inputs.vm-name }}
-          condition:
