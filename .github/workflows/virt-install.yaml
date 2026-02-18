@@ -1,26 +1,7 @@
 name: Create virtual machine
 on:
-  push:
-    branches:
-      - '*'
-  workflow_dispatch:
-    inputs:
-      disk-url:
-        description: URL of disk to use
-      vm-name:
-        description: Name of the VM (libvirt domain)
-        default: vm1.example.com
-      osinfo:
-        description: The virt-install --osinfo argument value
-        default: generic
-      boot:
-        description: The virt-install --boot argument value
-        default: uefi
-      virt-customize:
-        description: Arguments to virt-customize to be run on the image
-      command:
-        description: Command to run in the VM
-
+  - push
+  - workflow_dispatch
 jobs:
   test-plan:
     name: Generate test plan
@@ -76,14 +57,14 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.test-plan.outputs.matrix-run) }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: ${{ matrix.disk-url }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
           virt-customize: ${{ matrix.virt-customize }}
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/inventory
         with:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
@@ -103,7 +84,7 @@ jobs:
           virsh undefine --nvram '${{ needs.test-plan.outputs.vm-name }}'
           rm -f ~/.ssh/known_hosts
         if: matrix.second-machine == 'recreate' || matrix.second-machine == 'local-file'
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: ${{ matrix.disk-url }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
@@ -118,7 +99,7 @@ jobs:
         if: matrix.second-machine == 'local-file'
         env:
           DISK_URL: ${{ matrix.disk-url }}
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: file://${{ github.workspace }}/${{ steps.fetch-image.outputs.local-image-file }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
@@ -138,7 +119,7 @@ jobs:
         if: matrix.second-machine == 'recreate' || matrix.second-machine == 'local-file'
 
       - id: run-machine-2
-        uses: ./
+        uses: adelton/virt-install@master
         with:
           disk-url: ${{ matrix.disk-url }}
           vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
@@ -160,13 +141,12 @@ jobs:
 
   virt-install-defaults:
     runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
     steps:
-      - uses: actions/checkout@v6
-      - uses: ./
+      - uses: adelton/virt-install@master
         with:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
       - run: ssh root@vm1.example.com cat /etc/os-release
+      - uses: actions/checkout@v6
       # With default boot (uefi) and osinfo (generic), we get Secure Boot disabled
       - uses: ./.github/actions/secure-boot-check
         with:
