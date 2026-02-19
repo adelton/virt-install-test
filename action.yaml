@@ -24,7 +24,7 @@ runs:
       shell: |
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
     - run: |
-        sudo apt install genisoimage libvirt-daemon-system virtinst expect
+        sudo apt install guestfs-tools libvirt-daemon-system virtinst expect
         # we install libvirt-daemon-system and not just libvirt-daemon
         # to get the libvirtd.service which configures virbr0
       shell: |
@@ -52,19 +52,12 @@ runs:
     - run: |
         [ -f ~/.ssh/id_rsa ] || ssh-keygen -N '' -f ~/.ssh/id_rsa
       shell: bash
-    - run: |
-        (
-          cd virt-install-images
-          echo 'instance-id: ${{ inputs.vm-name }}' | tee meta-data
-          (
-            echo '#cloud-config'
-            echo 'disable_root: false'
-            echo 'ssh_authorized_keys:'
-            sed 's/^/  - /' ~/.ssh/id_rsa.pub
-          ) | tee user-data
-          genisoimage -output '${{ inputs.vm-name }}'-cloud-init.iso -volid cidata -joliet -rock user-data meta-data
-        )
-      shell: bash -euxo pipefail {0}
+    # /boot/vmlinuz-6.14.0-1017-azure has permissions 600 so virt-customize cannot read it
+    - run: sudo chmod a+r /boot/vmlinuz*
+      shell: bash
+    - run: virt-customize -v -x --no-network -a virt-install-images/${{ inputs.vm-name }}.qcow2 --ssh-inject root:file:$HOME/.ssh/id_rsa.pub
+      shell: |
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
     - run: |
         systemctl status libvirtd.service
         ip a
@@ -77,7 +70,6 @@ runs:
         virt-install --connect qemu:///session --graphics none --noautoconsole \
           --name '${{ inputs.vm-name }}' --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/'${{ inputs.vm-name }}'.qcow2 \
-          --disk path=virt-install-images/'${{ inputs.vm-name }}'-cloud-init.iso,device=cdrom \
           --osinfo "$INPUT_OSINFO" --boot uefi
       env:
         INPUT_OSINFO: ${{ inputs.osinfo }}
