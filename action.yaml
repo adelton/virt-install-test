@@ -70,7 +70,7 @@ runs:
         virt-install --connect qemu:///session --graphics none --noautoconsole \
           --name '${{ inputs.vm-name }}' --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/'${{ inputs.vm-name }}'.qcow2 \
-          --osinfo "$INPUT_OSINFO"
+          --osinfo "$INPUT_OSINFO" --boot uefi
       env:
         INPUT_OSINFO: ${{ inputs.osinfo }}
       shell: bash
