@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2
+          disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
           vm-name: fedora-42.example.test
           osinfo: fedora41
       - uses: owenthereal/action-upterm@v1
