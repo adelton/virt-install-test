@@ -35,8 +35,6 @@ jobs:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
           vm-name: fedora-42.example.test
           osinfo: fedora41
-      - uses: owenthereal/action-upterm@v1
-        if: failure()
       - run: ssh root@fedora-42.example.test cat /etc/os-release
       - run: ssh root@fedora-42.example.test dnf install -y net-tools
       - run: ssh root@fedora-42.example.test netstat -ln
