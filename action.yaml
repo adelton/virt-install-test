@@ -55,7 +55,7 @@ runs:
     # /boot/vmlinuz-6.14.0-1017-azure has permissions 600 so virt-customize cannot read it
     - run: sudo chmod a+r /boot/vmlinuz*
       shell: bash
-    - run: virt-customize -v -x --no-network -a virt-install-images/${{ inputs.vm-name }}.qcow2 --ssh-inject root:file:$HOME/.ssh/id_rsa.pub
+    - run: virt-customize -v -x --no-network -a virt-install-images/${{ inputs.vm-name }}.qcow2 --root-password password:Secret123 --ssh-inject root:file:$HOME/.ssh/id_rsa.pub
       shell: |
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
     - run: |
