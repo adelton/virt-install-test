@@ -78,7 +78,7 @@ runs:
           --name '${{ inputs.vm-name }}' --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/'${{ inputs.vm-name }}'.qcow2 \
           --disk path=virt-install-images/'${{ inputs.vm-name }}'-cloud-init.iso,device=cdrom \
-          --osinfo "$INPUT_OSINFO" --boot uefi
+          --osinfo "$INPUT_OSINFO"
       env:
         INPUT_OSINFO: ${{ inputs.osinfo }}
       shell: bash
