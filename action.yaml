@@ -65,7 +65,7 @@ runs:
         INPUT_OSINFO: ${{ inputs.osinfo }}
       shell: bash
     - run: |
-        expect util/virsh-console.expect '${{ inputs.vm-name }}'
+        expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect '${{ inputs.vm-name }}'
         MAC=$( virsh --connect qemu:///session dumpxml '${{ inputs.vm-name }}' | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
         sudo virsh net-dhcp-leases default --mac $MAC
         IP=$( sudo virsh net-dhcp-leases default --mac $MAC | awk 'BEGIN { MAC=ARGV[1] ; delete ARGV[1] } $0 ~ MAC { gsub("/.*$", "", $5); print $5 }' $MAC )
