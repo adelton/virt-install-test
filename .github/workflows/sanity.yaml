@@ -11,6 +11,7 @@ jobs:
         vm-name:
           - A
           - $PWD
+          - -f
     steps:
       - uses: actions/checkout@v6
       - uses: ./

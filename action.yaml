@@ -15,7 +15,7 @@ runs:
   steps:
     - run: |
         echo "Checking the inputs.vm-name value [$INPUT_VM_NAME] is sane."
-        [[ "$INPUT_VM_NAME" =~ ^[-a-z0-9_.]+$ ]]
+        [[ "$INPUT_VM_NAME" =~ ^[a-z0-9_][-a-z0-9_.]*$ ]]
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: bash
