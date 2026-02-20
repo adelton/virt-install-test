@@ -78,6 +78,8 @@ runs:
         expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect '${{ inputs.vm-name }}'
       shell: |
         bash -euo pipefail -c "echo ::group::output of: virsh console ${{ inputs.vm-name }} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
+    - run: virsh --connect qemu:///session list
+      shell: bash
     - run: |
         MAC=$( virsh --connect qemu:///session dumpxml '${{ inputs.vm-name }}' | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
         virsh --connect qemu:///system net-dhcp-leases default --mac $MAC
