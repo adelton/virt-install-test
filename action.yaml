@@ -31,8 +31,8 @@ runs:
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
     - run: |
         mkdir -p virt-install-images/base
-        FILENAME="${INPUT_DISK_URL##*/}"
-        curl -LSs -o virt-install-images/base/"$FILENAME" "$INPUT_DISK_URL"
+        FILENAME=$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
+        [ -f virt-install-images/base/"$FILENAME" ] || curl -LSs -o virt-install-images/base/"$FILENAME" "$INPUT_DISK_URL"
         qemu-img create -f qcow2 -b base/"$FILENAME" -F qcow2 virt-install-images/'${{ inputs.vm-name }}'.qcow2
       env:
         INPUT_DISK_URL: ${{ inputs.disk-url }}
