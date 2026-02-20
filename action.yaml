@@ -31,9 +31,21 @@ runs:
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
     - run: |
         mkdir -p virt-install-images/base
-        FILENAME=$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
-        [ -f virt-install-images/base/"$FILENAME" ] || curl -LSs -o virt-install-images/base/"$FILENAME" "$INPUT_DISK_URL"
-        qemu-img create -f qcow2 -b base/"$FILENAME" -F qcow2 virt-install-images/'${{ inputs.vm-name }}'.qcow2
+        FILENAME=
+        if [[ "$INPUT_DISK_URL" =~ ^file: ]] ; then
+          if [[ "$INPUT_DISK_URL" =~ ^file:/// ]] ; then
+            FILENAME="${INPUT_DISK_URL#file://}"
+          elif [[ "$INPUT_DISK_URL" =~ ^file://localhost/ ]] ; then
+            FILENAME="${INPUT_DISK_URL#file://localhost}"
+          elif [[ "$INPUT_DISK_URL" =~ ^file:/ ]] && ! [[ "$INPUT_DISK_URL" =~ ^file:// ]] ; then
+            FILENAME="${INPUT_DISK_URL#file:}"
+          fi
+        fi
+        if [ -z "$FILENAME" ] ; then
+          FILENAME=base/$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
+          [ -f virt-install-images/"$FILENAME" ] || curl -LSs -o virt-install-images/"$FILENAME" "$INPUT_DISK_URL"
+        fi
+        qemu-img create -f qcow2 -b "$FILENAME" -F qcow2 virt-install-images/'${{ inputs.vm-name }}'.qcow2
       env:
         INPUT_DISK_URL: ${{ inputs.disk-url }}
       shell: bash -euxo pipefail {0}
