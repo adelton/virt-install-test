@@ -1,7 +1,7 @@
 #!/usr/bin/expect
 set DOMAIN [lindex $argv 0]
 
-set timeout 300
+set timeout 500
 
 spawn -noecho virsh -e "^D" console "$DOMAIN"
 expect {
