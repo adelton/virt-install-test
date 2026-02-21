@@ -4,7 +4,7 @@ on:
   - workflow_dispatch
 jobs:
   catch-unsafe-vm-name:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       matrix:

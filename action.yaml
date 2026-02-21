@@ -68,7 +68,7 @@ runs:
     - run: |
         systemctl status libvirtd.service
         ip a
-        sudo chmod a+rw /dev/kvm
+        [ -c /dev/kvm ] && sudo chmod a+rw /dev/kvm
         sudo mkdir /etc/qemu && echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
         sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
         sudo chmod a+rw /var/run/libvirt/libvirt-sock
