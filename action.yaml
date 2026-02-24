@@ -45,9 +45,10 @@ runs:
           FILENAME=base/$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
           [ -f virt-install-images/"$FILENAME" ] || curl -LSs -o virt-install-images/"$FILENAME" "$INPUT_DISK_URL"
         fi
-        qemu-img create -f qcow2 -b "$FILENAME" -F qcow2 virt-install-images/'${{ inputs.vm-name }}'.qcow2
+        qemu-img create -f qcow2 -b "$FILENAME" -F qcow2 virt-install-images/"$INPUT_VM_NAME".qcow2
       env:
         INPUT_DISK_URL: ${{ inputs.disk-url }}
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: bash -euxo pipefail {0}
     - run: |
         [ -f ~/.ssh/id_rsa ] || ssh-keygen -N '' -f ~/.ssh/id_rsa
@@ -55,15 +56,17 @@ runs:
     - run: |
         (
           cd virt-install-images
-          echo 'instance-id: ${{ inputs.vm-name }}' | tee meta-data
+          echo 'instance-id: $INPUT_VM_NAME' | tee meta-data
           (
             echo '#cloud-config'
             echo 'disable_root: false'
             echo 'ssh_authorized_keys:'
             sed 's/^/  - /' ~/.ssh/id_rsa.pub
           ) | tee user-data
-          genisoimage -output '${{ inputs.vm-name }}'-cloud-init.iso -volid cidata -joliet -rock user-data meta-data
+          genisoimage -output "$INPUT_VM_NAME"-cloud-init.iso -volid cidata -joliet -rock user-data meta-data
         )
+      env:
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: bash -euxo pipefail {0}
     - run: |
         systemctl status libvirtd.service
@@ -75,22 +78,29 @@ runs:
       shell: bash -euxo pipefail {0}
     - run: |
         virt-install --connect qemu:///session --graphics none --noautoconsole \
-          --name '${{ inputs.vm-name }}' --network bridge=virbr0,model=virtio --memory 2000 --import \
-          --disk virt-install-images/'${{ inputs.vm-name }}'.qcow2 \
-          --disk path=virt-install-images/'${{ inputs.vm-name }}'-cloud-init.iso,device=cdrom \
+          --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --memory 2000 --import \
+          --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
+          --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
           --osinfo "$INPUT_OSINFO" --boot uefi
       env:
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
         INPUT_OSINFO: ${{ inputs.osinfo }}
       shell: bash
     - run: |
-        expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect '${{ inputs.vm-name }}'
+        expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect "$INPUT_VM_NAME"
+      env:
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: |
         bash -euo pipefail -c "echo ::group::output of: virsh console ${{ inputs.vm-name }} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
     - run: |
-        MAC=$( virsh --connect qemu:///session dumpxml '${{ inputs.vm-name }}' | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
+        MAC=$( virsh --connect qemu:///session dumpxml "$INPUT_VM_NAME" | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
         virsh --connect qemu:///system net-dhcp-leases default --mac $MAC
         IP=$( virsh --connect qemu:///system net-dhcp-leases default --mac $MAC | awk 'BEGIN { MAC=ARGV[1] ; delete ARGV[1] } $0 ~ MAC { gsub("/.*$", "", $5); print $5 }' $MAC )
-        echo "$IP ${{ inputs.vm-name }}" | sudo tee -a /etc/hosts
+        echo "$IP $INPUT_VM_NAME" | sudo tee -a /etc/hosts
+      env:
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: bash -euxo pipefail {0}
-    - run: ssh -o 'StrictHostKeyChecking accept-new' -v root@'${{ inputs.vm-name }}' true
+    - run: ssh -o 'StrictHostKeyChecking accept-new' -v root@"$INPUT_VM_NAME" true
+      env:
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: bash
