@@ -4,7 +4,7 @@ on:
   - workflow_dispatch
 jobs:
   upterm-session:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v2
     - name: Setup upterm session
