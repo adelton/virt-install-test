@@ -1,22 +1,40 @@
 
 virt-install:
   disk-url:
-    https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2 :
+    https://repo.almalinux.org/almalinux/10.1/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.aarch64.qcow2 :
       name: AlmaLinux 10
       osinfo: almalinux10
-      inventory: tests/inventory/almalinux-10
-    https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2 :
+      inventory: tests/inventory/almalinux-10-aarch64
+      boot:
+        uefi:
+          secure-boot-check: secure-boot=yes,enrolled-keys=yes
+        hd:
+          secure-boot-check: secure-boot=yes,enrolled-keys=yes
+        uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+          secure-boot-check: secure-boot=yes,enrolled-keys=yes
+        uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+          secure-boot-check: secure-boot=no,enrolled-keys=no
+    https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2 :
       name: Fedora 43
       osinfo: fedora42
-      inventory: tests/inventory/fedora-43
-    https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2 :
+      inventory: tests/inventory/fedora-43-aarch64
+    https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2 :
       name: Fedora 42
       osinfo: fedora42
-      inventory: tests/inventory/fedora-42
-    https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-amd64.img :
+      inventory: tests/inventory/fedora-42-aarch64
+    https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-arm64.img :
       name: Ubuntu 24.04
       osinfo: ubuntu24.04
-      inventory: tests/inventory/ubuntu-24.04
+      inventory: tests/inventory/ubuntu-24.04-arm64
+      boot:
+        uefi:
+          secure-boot-check: secure-boot=yes,enrolled-keys=yes
+        hd:
+          secure-boot-check: secure-boot=yes,enrolled-keys=yes
+        uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+          secure-boot-check: secure-boot=yes,enrolled-keys=yes
+        uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+          secure-boot-check: secure-boot=no,enrolled-keys=no
     https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2 :
       name: Arch Linux latest
       osinfo: archlinux
@@ -42,4 +60,12 @@ virt-install:
   exclude:
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
       secure-boot-check: secure-boot=yes,enrolled-keys=yes
+    - disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
+      secure-boot-check: secure-boot=yes,enrolled-keys=yes
+    - disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
+      boot: hd
+    - disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2
+      secure-boot-check: secure-boot=yes,enrolled-keys=yes
+    - disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2
+      boot: hd
 

@@ -7,6 +7,13 @@ on:
     inputs:
       disk-url:
         description: URL of disk to use
+      arch:
+        description: Non-native CPU architecture (the --arch argument)
+        type: choice
+        options:
+          - (guess)
+          - x86_64
+          - aarch64
       vm-name:
         description: Name of the VM (libvirt domain)
         default: vm1.example.com
@@ -157,12 +164,11 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
       - run: ssh root@vm1.example.com cat /etc/os-release
-      # With default boot (uefi) and osinfo (generic), we get Secure Boot disabled
+      # With default boot (uefi) and osinfo (generic), we get Secure Boot disabled on x86_64
+      # but enabled on aarch64
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: vm1.example.com
-          # no Secure Boot even with the default --boot=uefi
-          # because of the --osinfo=generic default
-          condition: secure-boot=no,enrolled-keys=no
+          condition: secure-boot=yes,enrolled-keys=yes
