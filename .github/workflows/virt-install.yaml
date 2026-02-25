@@ -7,6 +7,8 @@ on:
     inputs:
       disk-url:
         description: URL of disk to use
+      arch:
+        description: The virt-install --arch argument value
       vm-name:
         description: Name of the VM (libvirt domain)
         default: vm1.example.com
@@ -27,20 +29,22 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
+          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.aarch64.qcow2
+          arch: aarch64
           osinfo: almalinux10
-          boot: hd
+          boot: uefi
       - run: ssh root@vm1.example.com cat /etc/os-release
       - run: ssh root@vm1.example.com ip a
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: vm1.example.com
-          condition: secure-boot=missing,enrolled-keys=missing
+          condition: secure-boot=yes,enrolled-keys=yes
       - run: virsh destroy vm1.example.com ; virsh undefine --nvram vm1.example.com
       - run: rm -f ~/.ssh/known_hosts
       - uses: ./
         with:
-          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
+          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.aarch64.qcow2
+          arch: aarch64
           osinfo: almalinux10
       - run: ssh root@vm1.example.com cat /etc/os-release
       - run: ssh root@vm1.example.com ip a
@@ -55,7 +59,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2
+          disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2
+          arch: aarch64
           vm-name: fedora-42.example.test
           osinfo: fedora42
           boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
@@ -66,17 +71,19 @@ jobs:
         with:
           vm-name: fedora-42.example.test
           condition: secure-boot=no,enrolled-keys=no
-      - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
+      - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
       - uses: ./
         with:
-          disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
+          disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
+          arch: aarch64
           vm-name: fedora-43.example.test
           osinfo: fedora42
+          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
       - run: ssh root@fedora-43.example.test cat /etc/os-release
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: fedora-43.example.test
-          condition: secure-boot=yes,enrolled-keys=yes
+          condition: secure-boot=no,enrolled-keys=no
   virt-install-ubuntu:
     runs-on: ubuntu-latest
     if: inputs.disk-url == ''
@@ -84,7 +91,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
+          arch: aarch64
           vm-name: ubuntu.example.test
           osinfo: ubuntu24.04
       - run: ssh root@ubuntu.example.test cat /etc/os-release
@@ -95,7 +103,8 @@ jobs:
           condition: secure-boot=yes,enrolled-keys=yes
       - uses: ./
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
+          arch: aarch64
           vm-name: ubuntu-2.example.test
           osinfo: ubuntu24.04
         id: run-ubuntu-2
@@ -147,6 +156,7 @@ jobs:
       - uses: ./
         with:
           disk-url: ${{ inputs.disk-url }}
+          arch: ${{ inputs.arch }}
           vm-name: ${{ inputs.vm-name }}
           osinfo: ${{ inputs.osinfo }}
           boot: ${{ inputs.boot }}
