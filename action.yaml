@@ -7,6 +7,8 @@ inputs:
   vm-name:
     description: Name of the VM (libvirt domain)
     default: vm1.example.com
+  arch:
+    description: The arch parameter to virt-install
   osinfo:
     description: The osinfo parameter to virt-install
     default: generic
@@ -28,7 +30,7 @@ runs:
       shell: |
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
     - run: |
-        sudo apt install genisoimage libvirt-daemon-system virtinst expect
+        sudo apt install genisoimage libvirt-daemon-system virtinst expect qemu-efi-arm
         # we install libvirt-daemon-system and not just libvirt-daemon
         # to get the libvirtd.service which configures virbr0
       shell: |
@@ -75,20 +77,23 @@ runs:
     - run: |
         systemctl status libvirtd.service || true
         ip a
-        sudo chmod a+rw /dev/kvm
+        [ -c /dev/kvm ] && sudo chmod a+rw /dev/kvm
         sudo mkdir /etc/qemu && echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
         sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
         sudo chmod a+rw /var/run/libvirt/libvirt-sock
       shell: bash -euxo pipefail {0}
     - run: |
         # virt-install
+        args=()
+        [ -n "$INPUT_ARCH" ] && args+=( --arch "$INPUT_ARCH" )
         (
         set -x
         virt-install --graphics none --noautoconsole --noreboot \
           --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
           --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
-          --osinfo "$INPUT_OSINFO" --boot uefi
+          --osinfo "$INPUT_OSINFO" --boot uefi \
+          "${args[@]}"
         )
         echo '::group::domain XML'
         virsh dumpxml "$INPUT_VM_NAME"
@@ -97,6 +102,7 @@ runs:
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
         INPUT_OSINFO: ${{ inputs.osinfo }}
+        INPUT_ARCH: ${{ inputs.arch }}
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: bash
     - run: |

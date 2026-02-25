@@ -18,13 +18,14 @@ on:
 
 jobs:
   virt-install-almalinux:
-    runs-on: ubuntu-latest
+    name: AlmaLinux 10 (aarch64 @ aarch64)
+    runs-on: ubuntu-24.04-arm
     if: inputs.disk-url == ''
     steps:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
+          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.aarch64.qcow2
           osinfo: almalinux10
       - run: ssh root@vm1.example.com cat /etc/os-release
       - run: ssh root@vm1.example.com ip a
@@ -35,6 +36,7 @@ jobs:
             | grep -Fq secure-boot=yes,enrolled-keys=yes
         shell: bash -euo pipefail {0}
   virt-install-fedora:
+    name: Fedora 42 and 43 (x86_64 @ x86_64)
     runs-on: ubuntu-latest
     if: inputs.disk-url == ''
     steps:
@@ -59,6 +61,7 @@ jobs:
           disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
           vm-name: fedora-43.example.test
           osinfo: fedora42
+          arch: x86_64
       - run: ssh root@fedora-43.example.test cat /etc/os-release
       - run: sudo apt install xsltproc
       - run: |
@@ -67,6 +70,7 @@ jobs:
             | grep -Fq secure-boot=yes,enrolled-keys=yes
         shell: bash -euo pipefail {0}
   virt-install-ubuntu:
+    name: Ubuntu 24.04 (x86_64 and aarch64 @ x86_64)
     runs-on: ubuntu-latest
     if: inputs.disk-url == ''
     steps:
@@ -86,9 +90,10 @@ jobs:
         shell: bash -euo pipefail {0}
       - uses: ./
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
           vm-name: ubuntu-2.example.test
           osinfo: ubuntu24.04
+          arch: aarch64
         id: run-ubuntu-2
       - run: ssh root@ubuntu-2.example.test cat /etc/os-release
       - run: ssh root@ubuntu.example.test 'ssh-keygen -N "" -f ~/.ssh/id_rsa'
