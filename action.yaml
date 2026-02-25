@@ -87,6 +87,7 @@ runs:
         INPUT_OSINFO: ${{ inputs.osinfo }}
       shell: bash
     - run: |
+        ( while true ; do uptime ; sleep 5 ; done ) &
         expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect "$INPUT_VM_NAME"
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
