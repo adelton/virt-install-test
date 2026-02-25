@@ -4,6 +4,8 @@ inputs:
   disk-url:
     description: URL of disk to use
     required: true
+  arch:
+    description: The arch parameter to virt-install
   vm-name:
     description: Name of the VM (libvirt domain)
     default: vm1.example.com
@@ -36,6 +38,30 @@ runs:
         # to get the libvirtd.service which configures virbr0
       shell: |
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
+    - run: ( echo -n 'uname=' ; uname -m ) | tee -a $GITHUB_OUTPUT
+      shell: bash
+      id: uname
+    - run: |
+        if [ -n "$INPUT_ARCH" ] ; then
+            echo "arch=$INPUT_ARCH"
+        elif [[ "$INPUT_DISK_URL" =~ [-/.](aarch64|arm64)[-/.] ]] ; then
+            echo 'arch=aarch64'
+        elif [[ "$INPUT_DISK_URL" =~ [-/.](x86_64|amd64)[-/.] ]] ; then
+            echo 'arch=x86_64'
+        fi | tee -a $GITHUB_OUTPUT
+      shell: bash
+      id: arch
+      env:
+        INPUT_DISK_URL: ${{ inputs.disk-url }}
+        INPUT_ARCH: ${{ inputs.arch }}
+    - run: sudo apt install qemu-system-arm qemu-efi-aarch64
+      shell: |
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
+      if: steps.uname.outputs.uname == 'x86_64' && steps.arch.outputs.arch == 'aarch64'
+    - run: sudo apt install qemu-system-x86
+      shell: |
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
+      if: steps.uname.outputs.uname == 'aarch64' && steps.arch.outputs.arch == 'x86_64'
     - run: |
         mkdir -p virt-install-images/base
         FILENAME=
@@ -85,13 +111,16 @@ runs:
       shell: bash -euxo pipefail {0}
     - run: |
         # virt-install
+        args=()
+        [ -n "$INPUT_ARCH" ] && args+=( --arch "$INPUT_ARCH" )
         (
         set -x
         virt-install --graphics none --noautoconsole --noreboot \
           --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
           --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
-          --osinfo "$INPUT_OSINFO" --boot "$INPUT_BOOT"
+          --osinfo "$INPUT_OSINFO" --boot "$INPUT_BOOT" \
+          "${args[@]}"
         )
         echo '::group::domain XML'
         virsh dumpxml "$INPUT_VM_NAME"
@@ -99,6 +128,7 @@ runs:
         virsh start "$INPUT_VM_NAME"
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
+        INPUT_ARCH: ${{ steps.arch.outputs.arch }}
         INPUT_OSINFO: ${{ inputs.osinfo }}
         INPUT_BOOT: ${{ inputs.boot }}
         LIBVIRT_DEFAULT_URI: qemu:///session
