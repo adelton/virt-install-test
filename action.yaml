@@ -77,14 +77,19 @@ runs:
         sudo chmod a+rw /var/run/libvirt/libvirt-sock
       shell: bash -euxo pipefail {0}
     - run: |
-        virt-install --connect qemu:///session --graphics none --noautoconsole \
+        virt-install --graphics none --noautoconsole --noreboot \
           --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
           --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
           --osinfo "$INPUT_OSINFO" --boot uefi
+        echo '::group::domain XML'
+        virsh dumpxml "$INPUT_VM_NAME"
+        echo '::endgroup::'
+        virsh start "$INPUT_VM_NAME"
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
         INPUT_OSINFO: ${{ inputs.osinfo }}
+        LIBVIRT_DEFAULT_URI: qemu:///session
       shell: bash
     - run: |
         expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect "$INPUT_VM_NAME"
