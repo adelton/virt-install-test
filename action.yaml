@@ -107,21 +107,6 @@ runs:
         INPUT_VIRT_CUSTOMIZE: ${{ inputs.virt-customize }}
       if: inputs.virt-customize != ''
     - run: |
-        (
-          cd virt-install-images
-          echo 'instance-id: $INPUT_VM_NAME' | tee meta-data
-          (
-            echo '#cloud-config'
-            echo 'disable_root: false'
-            echo 'ssh_authorized_keys:'
-            sed 's/^/  - /' ~/.ssh/id_rsa.pub
-          ) | tee user-data
-          genisoimage -output "$INPUT_VM_NAME"-cloud-init.iso -volid cidata -joliet -rock -input-charset utf-8 user-data meta-data
-        )
-      env:
-        INPUT_VM_NAME: ${{ inputs.vm-name }}
-      shell: bash -euxo pipefail {0}
-    - run: |
         systemctl status libvirtd.service || true
         ip a
         [ -c /dev/kvm ] && sudo chmod a+rw /dev/kvm
@@ -139,14 +124,13 @@ runs:
         virt-install --graphics none --noautoconsole --noreboot \
           --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --import \
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
-          --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
+          --cloud-init root-ssh-key=$HOME/.ssh/id_rsa.pub \
           --osinfo "$INPUT_OSINFO" --boot "$INPUT_BOOT" \
           "${args[@]}"
         )
         echo '::group::domain XML'
         virsh dumpxml "$INPUT_VM_NAME"
         echo '::endgroup::'
-        virsh start "$INPUT_VM_NAME"
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
         INPUT_ARCH: ${{ steps.image-arch.outputs.arch }}
