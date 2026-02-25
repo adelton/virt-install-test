@@ -54,21 +54,6 @@ runs:
         [ -f ~/.ssh/id_rsa ] || ssh-keygen -N '' -f ~/.ssh/id_rsa
       shell: bash
     - run: |
-        (
-          cd virt-install-images
-          echo 'instance-id: $INPUT_VM_NAME' | tee meta-data
-          (
-            echo '#cloud-config'
-            echo 'disable_root: false'
-            echo 'ssh_authorized_keys:'
-            sed 's/^/  - /' ~/.ssh/id_rsa.pub
-          ) | tee user-data
-          genisoimage -output "$INPUT_VM_NAME"-cloud-init.iso -volid cidata -joliet -rock user-data meta-data
-        )
-      env:
-        INPUT_VM_NAME: ${{ inputs.vm-name }}
-      shell: bash -euxo pipefail {0}
-    - run: |
         systemctl status libvirtd.service || true
         ip a
         sudo chmod a+rw /dev/kvm
@@ -80,7 +65,7 @@ runs:
         virt-install --graphics none --noautoconsole --noreboot \
           --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
-          --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
+          --cloud-init root-ssh-key=$HOME/.ssh/id_rsa.pub \
           --osinfo "$INPUT_OSINFO" --boot uefi
         echo '::group::domain XML'
         virsh dumpxml "$INPUT_VM_NAME"
