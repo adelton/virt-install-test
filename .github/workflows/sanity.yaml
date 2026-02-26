@@ -1,6 +1,8 @@
 name: Verify action inputs handling
 on:
-  - push
+  - push:
+      branches-ignore:
+        - 'osinfo-update/**'
   - workflow_dispatch
 jobs:
   catch-unsafe-vm-name:

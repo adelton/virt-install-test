@@ -97,7 +97,10 @@ Example:
           osinfo: fedora41
 ```
 
-Default: `detect=on`.
+Default: `generic`.
+
+Possible values depend on the version of the `osinfo-db` package on the host,
+see [the list of `osinfo` values on Ubuntu 24.04 runners](docs/osinfo-ubuntu-24.04.md).
 
 ## License
 

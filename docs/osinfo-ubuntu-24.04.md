@@ -1,0 +1,380 @@
+On Ubuntu 24.04.1 LTS runners,
+supported `osinfo` parameter values are based
+on the `osinfo-db` package, currently in version
+0.20250606-0ubuntu0.24.04.1.
+Only values for distributions that haven't been marked end-of-life
+for extended period of time are shown.
+
+- almalinux
+    - `almalinux-kitten10`
+    - `almalinux10`
+    - `almalinux9`
+    - `almalinux8`
+- alpinelinux
+    - `alpinelinux3.21`
+    - `alpinelinux3.20`
+    - `alpinelinux3.19`
+    - `alpinelinux3.18`
+    - `alpinelinux3.17`
+    - `alpinelinux3.16`
+- alt
+    - `alt10.3`
+    - `alt10.2`
+    - `alt10.1`
+    - `alt10.0`
+    - `alt.p10`
+    - `alt.p11`
+    - `alt.p8`
+    - `alt.p9`
+    - `alt.sisyphus`
+- android-x86
+    - `android-x86-9.0`
+    - `android-x86-8.1`
+- anolis
+    - `anolis23.1`
+    - `anolis23.0`
+    - `anolis8.9`
+    - `anolis8.8`
+    - `anolis8.6`
+    - `anolis8.4`
+    - `anolis8.2`
+    - `anolis7.9`
+    - `anolis7.7`
+    - `anolis8-unknown`
+    - `anolis-unknown`
+- archlinux
+    - `archlinux`
+- asianux
+    - `asianux8.0`
+    - `asianux7.3`
+    - `asianux7.2`
+    - `asianux7.1`
+    - `asianux7.0`
+    - `asianux4.7`
+    - `asianux4.6`
+    - `asianux-unknown`
+- caasp
+    - `caasp-unknown`
+- centos
+    - `centos-stream10`
+    - `centos-stream9`
+    - `centos-stream8`
+    - `centos7.0`
+- circle
+    - `circle9.0`
+    - `circle8.5`
+    - `circle8.4`
+    - `circle8-unknown`
+    - `circle9-unknown`
+    - `circle-unknown`
+- cirros
+    - `cirros0.4.0`
+    - `cirros0.5.0`
+    - `cirros0.5.1`
+    - `cirros0.5.2`
+- clearlinux
+    - `clearlinux`
+- debian
+    - `debian13`
+    - `debian12`
+    - `debian11`
+    - `debian10`
+    - `debiantesting`
+    - `debianunstable`
+- dragonflybsd
+    - `dragonflybsd5.6`
+    - `dragonflybsd1.12.2`
+    - `dragonflybsd2.0.1`
+- elementaryos
+    - `elementary5.0`
+- eos
+    - `eos6.0`
+    - `eos5.1`
+    - `eos4.0`
+- eurolinux
+    - `eurolinux9`
+    - `eurolinux8`
+- fedora
+    - `fedora42`
+    - `fedora41`
+    - `silverblue41`
+    - `fedora40`
+    - `silverblue40`
+    - `fedora39`
+    - `silverblue39`
+    - `fedora38`
+    - `silverblue38`
+    - `fedora-eln`
+    - `fedora-coreos-next`
+    - `fedora-rawhide`
+    - `silverblue-rawhide`
+    - `fedora-coreos-stable`
+    - `fedora-coreos-testing`
+    - `fedora-unknown`
+    - `silverblue-unknown`
+- freebsd
+    - `freebsd14.2`
+    - `freebsd14.1`
+    - `freebsd14.0`
+    - `freebsd13.4`
+    - `freebsd13.3`
+    - `freebsd13.2`
+    - `freebsd4.5`
+    - `freebsd4.4`
+    - `freebsd4.3`
+    - `freebsd4.2`
+    - `freebsd4.1`
+    - `freebsd4.0`
+    - `freebsd3.2`
+    - `freebsd3.0`
+    - `freebsd2.0`
+    - `freebsd1.0`
+    - `freebsd2.0.5`
+    - `freebsd2.2.8`
+    - `freebsd2.2.9`
+- freedos
+    - `freedos1.3`
+- freenix
+    - `freenix14.2`
+- generic linux
+    - `linux2024`
+    - `linux2022`
+    - `linux2020`
+- generic unknown
+    - `unknown`
+- gentoo
+    - `gentoo`
+- gnome
+    - `gnome-continuous-3.14`
+- guix-system
+    - `guix-system-1.4`
+    - `guix-system-1.3`
+    - `guix-system-1.1`
+    - `guix-system-hurd-latest`
+    - `guix-system-latest`
+- haiku
+    - `haikunightly`
+    - `haikur1beta4`
+- hyperbola
+    - `hyperbola03`
+- mageia
+    - `mageia9`
+- mandrake
+    - `mandrake10.2`
+    - `mandrake10.1`
+    - `mandrake10.0`
+    - `mandrake9.2`
+    - `mandrake9.1`
+    - `mandrake9.0`
+    - `mandrake8.2`
+    - `mandrake8.1`
+    - `mandrake8.0`
+    - `mandrake7.2`
+    - `mandrake7.1`
+    - `mandrake7.0`
+    - `mandrake6.1`
+    - `mandrake6.0`
+    - `mandrake5.3`
+    - `mandrake5.2`
+    - `mandrake5.1`
+- mandriva
+    - `mandriva2010.2`
+    - `mandriva2007.1`
+    - `mandriva2007`
+    - `mandriva2006.0`
+- Manjaro
+    - `manjaro`
+- miraclelinux
+    - `miraclelinux9.0`
+    - `miraclelinux8.4`
+    - `miraclelinux8-unknown`
+    - `miraclelinux9-unknown`
+- netbsd
+    - `netbsd10.0`
+    - `netbsd9.4`
+    - `netbsd9.3`
+    - `netbsd9.2`
+    - `netbsd9.1`
+    - `netbsd9.0`
+    - `netbsd8.2`
+    - `netbsd8.1`
+    - `netbsd8.0`
+    - `netbsd4.0`
+    - `netbsd0.9`
+    - `netbsd0.8`
+- netware
+    - `netware6`
+    - `netware5`
+    - `netware4`
+- nixos
+    - `nixos-25.05`
+    - `nixos-24.11`
+    - `nixos-24.05`
+    - `nixos-23.11`
+    - `nixos-unknown`
+    - `nixos-unstable`
+- ol
+    - `ol9.4`
+    - `ol9.3`
+    - `ol9.2`
+    - `ol9.1`
+    - `ol9.0`
+    - `ol8.9`
+    - `ol8.8`
+    - `ol8.7`
+    - `ol8.6`
+    - `ol8.5`
+    - `ol8.4`
+    - `ol8.3`
+    - `ol8.2`
+    - `ol8.1`
+    - `ol8.10`
+    - `ol8.0`
+    - `ol7.9`
+    - `ol7.8`
+    - `ol7.7`
+    - `ol7.6`
+    - `ol7.5`
+    - `ol7.4`
+    - `ol7.3`
+    - `ol7.2`
+    - `ol7.1`
+    - `ol7.0`
+    - `ol6.9`
+    - `ol6.8`
+    - `ol6.7`
+    - `ol6.6`
+    - `ol6.5`
+    - `ol6.4`
+    - `ol6.3`
+    - `ol6.2`
+    - `ol6.1`
+    - `ol6.10`
+    - `ol6.0`
+    - `ol9-unknown`
+- omnios
+    - `omnios`
+- openbsd
+    - `openbsd7.6`
+    - `openbsd7.5`
+    - `openbsd7.4`
+    - `openbsd7.3`
+- openindiana
+    - `openindiana`
+- opensuse
+    - `opensuse15.6`
+    - `opensuse15.5`
+    - `opensuse-factory`
+    - `opensusetumbleweed`
+    - `opensuse-unknown`
+- popos
+    - `popos20.10`
+    - `popos20.04`
+    - `popos19.10`
+- pureos
+    - `pureos10`
+    - `pureos9`
+    - `pureos8`
+- rhel
+    - `rhel10.1`
+    - `rhel10.0`
+    - `rhel9.7`
+    - `rhel9.6`
+    - `rhel9.5`
+    - `rhel9.4`
+    - `rhel9.3`
+    - `rhel9.2`
+    - `rhel9.1`
+    - `rhel9.0`
+    - `rhel8.9`
+    - `rhel8.8`
+    - `rhel8.7`
+    - `rhel8.6`
+    - `rhel8.5`
+    - `rhel8.4`
+    - `rhel8.3`
+    - `rhel8.2`
+    - `rhel8.1`
+    - `rhel8.10`
+    - `rhel8.0`
+    - `rhel7.9`
+    - `rhel7.8`
+    - `rhel7.7`
+    - `rhel7.6`
+    - `rhel7.5`
+    - `rhel7.4`
+    - `rhel7.3`
+    - `rhel7.2`
+    - `rhel7.1`
+    - `rhel7.0`
+    - `rhel6.10`
+    - `rhel10-unknown`
+    - `rhel6-unknown`
+    - `rhel7-unknown`
+    - `rhel8-unknown`
+    - `rhel9-unknown`
+    - `rhel-unknown`
+- rocky
+    - `rocky9`
+    - `rocky8`
+    - `rocky-unknown`
+- scientificlinux
+    - `scientificlinux7-unknown`
+- slackware
+    - `slackware15.0`
+    - `slackwarearm15.0`
+    - `slackware14.2`
+    - `slackware14.1`
+    - `slackware14.0`
+    - `slackware-current`
+    - `slackwarearm-current`
+- sle
+    - `sle15sp6`
+    - `sle15sp5`
+    - `sle15sp4`
+    - `sle15-unknown`
+    - `sle-unknown`
+- sled
+    - `sled12sp5`
+    - `sled12-unknown`
+- slem
+    - `slem5.5`
+    - `slem5.4`
+    - `slem5.3`
+    - `slem5.2`
+    - `slem5.1`
+- sles
+    - `sles12sp5`
+    - `sles12-unknown`
+- smartos
+    - `smartos`
+- solaris
+    - `solaris11`
+    - `solaris10`
+- trisquel
+    - `trisquel11`
+    - `trisquel10`
+- ubuntu
+    - `ubuntu25.10`
+    - `ubuntu25.04`
+    - `ubuntu24.10`
+    - `ubuntu24.04`
+    - `ubuntu23.10`
+    - `ubuntu22.04`
+    - `ubuntu20.04`
+    - `ubuntu18.04`
+    - `ubuntu16.04`
+    - `ubuntu14.04`
+- ucs
+    - `ucs5.0`
+    - `ucs4.4`
+- voidlinux
+    - `voidlinux`
+- win
+    - `win11`
+    - `win10`
+    - `win2k16`
+    - `win2k19`
+    - `win2k22`
+    - `win2k25`
+    - `win7`

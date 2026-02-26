@@ -1,6 +1,8 @@
 name: Create virtual machine
 on:
   push:
+    branches-ignore:
+      - 'osinfo-update/**'
   workflow_dispatch:
     inputs:
       disk-url:
