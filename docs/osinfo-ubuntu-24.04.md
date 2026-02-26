@@ -1,4 +1,4 @@
-On Ubuntu 24.04.1 LTS runners,
+On Ubuntu 24.04.3 LTS runners,
 supported `osinfo` parameter values are based
 on the `osinfo-db` package, currently in version
 0.20250606-0ubuntu0.24.04.1.
@@ -15,13 +15,9 @@ for extended period of time are shown.
     - `alpinelinux3.20`
     - `alpinelinux3.19`
     - `alpinelinux3.18`
-    - `alpinelinux3.17`
-    - `alpinelinux3.16`
 - alt
     - `alt10.3`
     - `alt10.2`
-    - `alt10.1`
-    - `alt10.0`
     - `alt.p10`
     - `alt.p11`
     - `alt.p8`
@@ -58,8 +54,6 @@ for extended period of time are shown.
 - centos
     - `centos-stream10`
     - `centos-stream9`
-    - `centos-stream8`
-    - `centos7.0`
 - circle
     - `circle9.0`
     - `circle8.5`
@@ -78,7 +72,6 @@ for extended period of time are shown.
     - `debian13`
     - `debian12`
     - `debian11`
-    - `debian10`
     - `debiantesting`
     - `debianunstable`
 - dragonflybsd
@@ -89,8 +82,6 @@ for extended period of time are shown.
     - `elementary5.0`
 - eos
     - `eos6.0`
-    - `eos5.1`
-    - `eos4.0`
 - eurolinux
     - `eurolinux9`
     - `eurolinux8`
@@ -100,10 +91,6 @@ for extended period of time are shown.
     - `silverblue41`
     - `fedora40`
     - `silverblue40`
-    - `fedora39`
-    - `silverblue39`
-    - `fedora38`
-    - `silverblue38`
     - `fedora-eln`
     - `fedora-coreos-next`
     - `fedora-rawhide`
@@ -115,10 +102,7 @@ for extended period of time are shown.
 - freebsd
     - `freebsd14.2`
     - `freebsd14.1`
-    - `freebsd14.0`
     - `freebsd13.4`
-    - `freebsd13.3`
-    - `freebsd13.2`
     - `freebsd4.5`
     - `freebsd4.4`
     - `freebsd4.3`
@@ -139,7 +123,6 @@ for extended period of time are shown.
 - generic linux
     - `linux2024`
     - `linux2022`
-    - `linux2020`
 - generic unknown
     - `unknown`
 - gentoo
@@ -240,25 +223,12 @@ for extended period of time are shown.
     - `ol7.2`
     - `ol7.1`
     - `ol7.0`
-    - `ol6.9`
-    - `ol6.8`
-    - `ol6.7`
-    - `ol6.6`
-    - `ol6.5`
-    - `ol6.4`
-    - `ol6.3`
-    - `ol6.2`
-    - `ol6.1`
-    - `ol6.10`
-    - `ol6.0`
     - `ol9-unknown`
 - omnios
     - `omnios`
 - openbsd
     - `openbsd7.6`
     - `openbsd7.5`
-    - `openbsd7.4`
-    - `openbsd7.3`
 - openindiana
     - `openindiana`
 - opensuse
@@ -307,9 +277,7 @@ for extended period of time are shown.
     - `rhel7.2`
     - `rhel7.1`
     - `rhel7.0`
-    - `rhel6.10`
     - `rhel10-unknown`
-    - `rhel6-unknown`
     - `rhel7-unknown`
     - `rhel8-unknown`
     - `rhel9-unknown`
@@ -335,7 +303,6 @@ for extended period of time are shown.
     - `sle15-unknown`
     - `sle-unknown`
 - sled
-    - `sled12sp5`
     - `sled12-unknown`
 - slem
     - `slem5.5`
@@ -344,7 +311,6 @@ for extended period of time are shown.
     - `slem5.2`
     - `slem5.1`
 - sles
-    - `sles12sp5`
     - `sles12-unknown`
 - smartos
     - `smartos`
@@ -359,12 +325,10 @@ for extended period of time are shown.
     - `ubuntu25.04`
     - `ubuntu24.10`
     - `ubuntu24.04`
-    - `ubuntu23.10`
     - `ubuntu22.04`
     - `ubuntu20.04`
     - `ubuntu18.04`
     - `ubuntu16.04`
-    - `ubuntu14.04`
 - ucs
     - `ucs5.0`
     - `ucs4.4`
