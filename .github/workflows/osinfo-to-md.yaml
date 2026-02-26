@@ -1,0 +1,41 @@
+name: Retrieve possible osinfo values
+on:
+  push:
+    branches:
+      - '*'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  osinfo-to-md:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - run: sudo apt update
+      - run: sudo apt install osinfo-db xsltproc
+      - run: util/osinfo-to-md.sh > docs/osinfo-ubuntu-24.04.md
+      - run: git diff --exit-code -- docs/osinfo-ubuntu-24.04.md
+        id: git-diff
+        continue-on-error: true
+      - run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
+
+          OSINFO_DB_VERSION=$( dpkg-query -W -f '${Version}\n' osinfo-db )
+          BRANCH="osinfo-update/$OSINFO_DB_VERSION/$( date +%F )"
+          git checkout -b "$BRANCH"
+          git add docs/osinfo-ubuntu-24.04.md
+          COMMIT_MESSAGE="Update osinfo documentation for osinfo-db $OSINFO_DB_VERSION."
+          git commit -m "$COMMIT_MESSAGE"
+          git push origin "$BRANCH:$BRANCH"
+
+          echo '{ "head": "'"$BRANCH"'", "base": "master", "title": "'"$COMMIT_MESSAGE"'" }' \
+          | tee /dev/stderr \
+          | curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H 'Content-Type: application/json' \
+            -d '@-' \
+            ${{ github.api_url }}/repos/${{ github.repository }}/pulls
+        shell: bash -euxo pipefail {0}
+        if: steps.git-diff.outcome == 'failure'
