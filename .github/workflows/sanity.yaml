@@ -1,7 +1,9 @@
 name: Verify action inputs handling
 on:
-  - push
-  - workflow_dispatch
+  push:
+    branches:
+      - '*'
+  workflow_dispatch:
 jobs:
   catch-unsafe-vm-name:
     runs-on: ubuntu-latest
