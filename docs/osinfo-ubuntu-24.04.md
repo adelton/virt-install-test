@@ -4,7 +4,6 @@ on the `osinfo-db` package, currently in version
 0.20250606-0ubuntu0.24.04.1.
 Only values for distributions that haven't been marked end-of-life
 for extended period of time are shown.
-Test the PR behaviour.
 
 - almalinux
     - `almalinux-kitten10`
