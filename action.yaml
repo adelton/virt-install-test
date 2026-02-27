@@ -9,7 +9,7 @@ inputs:
     default: vm1.example.com
   osinfo:
     description: The osinfo parameter to virt-install
-    default: detect=on
+    default: generic
 runs:
   using: composite
   steps:
