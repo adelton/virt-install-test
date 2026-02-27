@@ -4,12 +4,12 @@ on:
     branches:
       - '*'
   workflow_dispatch:
-permissions:
-  contents: write
-  pull-requests: write
 jobs:
   osinfo-to-md:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
       - run: sudo apt update
@@ -23,14 +23,15 @@ jobs:
           git config --global user.email "github-actions@users.noreply.github.com"
 
           OSINFO_DB_VERSION=$( dpkg-query -W -f '${Version}\n' osinfo-db )
-          BRANCH="osinfo-update/$OSINFO_DB_VERSION/$( date +%F )"
+          DATE=$( date +%F )
+          BRANCH="osinfo-update/$OSINFO_DB_VERSION/$DATE"
           git checkout -b "$BRANCH"
           git add docs/osinfo-ubuntu-24.04.md
-          COMMIT_MESSAGE="Update osinfo documentation for osinfo-db $OSINFO_DB_VERSION."
+          COMMIT_MESSAGE="Update osinfo documentation for osinfo-db $OSINFO_DB_VERSION on $DATE."
           git commit -m "$COMMIT_MESSAGE"
           git push origin "$BRANCH:$BRANCH"
 
-          echo '{ "head": "'"$BRANCH"'", "base": "master", "title": "'"$COMMIT_MESSAGE"'" }' \
+          echo '{ "head": "'"$BRANCH"'", "base": "master", "title": "'"$COMMIT_MESSAGE"'", "body": "Update the osinfo documentation, capture the up-to-date list of short-ids and/or remove distributions that went EOL." }' \
           | tee /dev/stderr \
           | curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
