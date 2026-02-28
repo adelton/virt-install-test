@@ -42,7 +42,8 @@ After creating the virtual machine, the action will
 - wait for the `login:` prompt on the VM console;
 - determine the IP address that the VM got from DHCP;
 - add an entry to `/etc/hosts` for the VM name provided (input `vm-name`);
-- SSH to the VM as root to test the setup.
+- SSH to the VM as root to test the setup;
+- set the `ip-address` output.
 
 ## Inputs
 
@@ -101,6 +102,27 @@ Default: `generic`.
 
 Possible values depend on the version of the `osinfo-db` package on the host,
 see [the list of `osinfo` values on Ubuntu 24.04 runners](docs/osinfo-ubuntu-24.04.md).
+
+## Outputs
+
+### ip-address
+
+While the action sets resolution of the input `vm-name` to the VM IP
+address in `/etc/hosts`, sometimes having the actual IP address is more
+practical, for example to set up communications among multiple VMs.
+
+The output `ip-address` provides that IP address, if the action was
+able to retrieve it from the DHCP.
+
+Example:
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          osinfo: ubuntu24.04
+        id: run-server
+      - run: echo 'We will set our client VMs to talk to ${{ steps.run-server.outputs.ip-address }}'
+```
 
 ## License
 
