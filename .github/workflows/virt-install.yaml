@@ -43,7 +43,7 @@ jobs:
         with:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2
           vm-name: fedora-42.example.test
-          osinfo: fedora42
+          osinfo: generic
       - run: ssh root@fedora-42.example.test cat /etc/os-release
       - run: ssh root@fedora-42.example.test dnf install -y net-tools
       - run: ssh root@fedora-42.example.test netstat -ln
