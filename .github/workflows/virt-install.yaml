@@ -66,6 +66,10 @@ jobs:
           vm-name: ubuntu-2.example.test
           osinfo: ubuntu24.04
       - run: ssh root@ubuntu-2.example.test cat /etc/os-release
+      - run: ssh root@ubuntu.example.test 'ssh-keygen -N "" -f ~/.ssh/id_rsa'
+      - run: ssh root@ubuntu.example.test 'cat ~/.ssh/id_rsa.pub' | ssh root@ubuntu-2.example.test 'umask 077 && cat > ~/.ssh/authorized_keys'
+      - run: cat /etc/hosts
+      - run: IP2=$( awk '/ubuntu-2\.example\.test$/ { print $1 }' /etc/hosts ) ; ssh root@ubuntu.example.test "ssh -o 'StrictHostKeyChecking accept-new' root@$IP2 ip a"
 
   virt-install-manual:
     runs-on: ubuntu-latest
