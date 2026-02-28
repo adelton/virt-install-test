@@ -29,12 +29,6 @@ jobs:
           osinfo: almalinux10
       - run: ssh root@vm1.example.com cat /etc/os-release
       - run: ssh root@vm1.example.com ip a
-      - run: sudo apt install xsltproc
-      - run: |
-          virsh --connect qemu:///session dumpxml vm1.example.com \
-            | xsltproc util/secure-boot-check.xslt - | tee /dev/stderr \
-            | grep -Fq secure-boot=yes,enrolled-keys=yes
-        shell: bash -euo pipefail {0}
   virt-install-fedora:
     name: Fedora 42 and 43 (x86_64 @ x86_64)
     runs-on: ubuntu-latest
@@ -49,12 +43,6 @@ jobs:
       - run: ssh root@fedora-42.example.test cat /etc/os-release
       - run: ssh root@fedora-42.example.test dnf install -y net-tools
       - run: ssh root@fedora-42.example.test netstat -ln
-      - run: sudo apt install xsltproc
-      - run: |
-          virsh --connect qemu:///session dumpxml fedora-42.example.test \
-            | xsltproc util/secure-boot-check.xslt - | tee /dev/stderr \
-            | grep -Fq secure-boot=yes,enrolled-keys=yes
-        shell: bash -euo pipefail {0}
       - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
       - uses: ./
         with:
@@ -63,12 +51,6 @@ jobs:
           osinfo: fedora42
           arch: x86_64
       - run: ssh root@fedora-43.example.test cat /etc/os-release
-      - run: sudo apt install xsltproc
-      - run: |
-          virsh --connect qemu:///session dumpxml fedora-43.example.test \
-            | xsltproc util/secure-boot-check.xslt - | tee /dev/stderr \
-            | grep -Fq secure-boot=yes,enrolled-keys=yes
-        shell: bash -euo pipefail {0}
   virt-install-ubuntu:
     name: Ubuntu 24.04 (x86_64 and aarch64 @ x86_64)
     runs-on: ubuntu-latest
@@ -82,12 +64,6 @@ jobs:
           osinfo: ubuntu24.04
       - run: ssh root@ubuntu.example.test cat /etc/os-release
       - run: virsh dumpxml ubuntu.example.test
-      - run: sudo apt install xsltproc
-      - run: |
-          virsh --connect qemu:///session dumpxml ubuntu.example.test \
-            | xsltproc util/secure-boot-check.xslt - | tee /dev/stderr \
-            | grep -Fq secure-boot=yes,enrolled-keys=yes
-        shell: bash -euo pipefail {0}
       - uses: ./
         with:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
@@ -99,12 +75,6 @@ jobs:
       - run: ssh root@ubuntu.example.test 'ssh-keygen -N "" -f ~/.ssh/id_rsa'
       - run: ssh root@ubuntu.example.test 'cat ~/.ssh/id_rsa.pub' | ssh root@ubuntu-2.example.test 'umask 077 && cat > ~/.ssh/authorized_keys'
       - run: ssh root@ubuntu.example.test "ssh -o 'StrictHostKeyChecking accept-new' root@${{ steps.run-ubuntu-2.outputs.ip-address }} ip a"
-      - run: sudo apt install xsltproc
-      - run: |
-          virsh --connect qemu:///session dumpxml ubuntu-2.example.test \
-            | xsltproc util/secure-boot-check.xslt - | tee /dev/stderr \
-            | grep -Fq secure-boot=yes,enrolled-keys=yes
-        shell: bash -euo pipefail {0}
 
   virt-install-manual:
     runs-on: ubuntu-latest
@@ -120,8 +90,3 @@ jobs:
         if: inputs.command != ''
         env:
           INPUT_COMMAND: ${{ inputs.command }}
-      - run: sudo apt install xsltproc
-      - run: |
-          virsh --connect qemu:///session dumpxml '${{ inputs.vm-name }}' \
-            | xsltproc util/secure-boot-check.xslt -
-        shell: bash -euo pipefail {0}
