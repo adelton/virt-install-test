@@ -92,7 +92,7 @@ runs:
           --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
           --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
-          --osinfo "$INPUT_OSINFO" --boot uefi=off \
+          --osinfo "$INPUT_OSINFO" \
           "${args[@]}"
         )
         echo '::group::domain XML'
