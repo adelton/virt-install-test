@@ -30,11 +30,19 @@ runs:
       shell: |
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
     - run: |
-        sudo apt install genisoimage libvirt-daemon-system virtinst expect qemu-system-arm qemu-efi-aarch64
+        sudo apt install genisoimage libvirt-daemon-system virtinst expect
         # we install libvirt-daemon-system and not just libvirt-daemon
         # to get the libvirtd.service which configures virbr0
       shell: |
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
+    - run: ( echo -n 'uname=' ; uname -m ) | tee -a $GITHUB_OUTPUT
+      shell: bash
+      id: uname
+    - run: |
+        sudo apt install qemu-system-arm qemu-efi-aarch64
+      shell: |
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
+      if: inputs.arch == 'aarch64' && steps.uname.outputs.uname == 'x86_64'
     - run: |
         mkdir -p virt-install-images/base
         FILENAME=
