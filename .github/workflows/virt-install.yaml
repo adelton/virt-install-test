@@ -107,6 +107,37 @@ jobs:
         with:
           vm-name: ubuntu-2.example.test
           condition: secure-boot=yes,enrolled-keys=yes
+  virt-install-arch-linux:
+    runs-on: ubuntu-latest
+    if: inputs.disk-url == ''
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./
+        with:
+          disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+          vm-name: arch.example.test
+          osinfo: archlinux
+          boot: hd
+      - run: ssh root@arch.example.test cat /etc/os-release
+      - run: virsh dumpxml arch.example.test
+      - uses: ./.github/actions/secure-boot-check
+        with:
+          vm-name: arch.example.test
+          condition: secure-boot=missing,enrolled-keys=missing
+      - run: virsh destroy arch.example.test ; virsh undefine arch.example.test
+      - run: rm -f ~/.ssh/known_hosts
+      - uses: ./
+        with:
+          disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+          vm-name: arch.example.test
+          osinfo: archlinux
+          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
+      - run: ssh root@arch.example.test cat /etc/os-release
+      - run: virsh dumpxml arch.example.test
+      - uses: ./.github/actions/secure-boot-check
+        with:
+          vm-name: arch.example.test
+          condition: secure-boot=no,enrolled-keys=no
 
   virt-install-manual:
     runs-on: ubuntu-latest
