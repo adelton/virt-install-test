@@ -34,6 +34,12 @@ virt-install:
       name: Arch Linux latest
       osinfo: archlinux
       inventory: tests/inventory/arch-linux-latest
+    https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.3-x86_64-uefi-cloudinit-r0.qcow2 :
+      name: Alpine Linux 3.23
+      osinfo: alpinelinux3.21
+      inventory: tests/inventory/alpine-linux-3.23
+      boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
+      secure-boot-check: secure-boot=no,enrolled-keys=no
 
   osinfo: linux2024
 
