@@ -103,6 +103,27 @@ Default: `generic`.
 Possible values depend on the version of the `osinfo-db` package on the host,
 see [the list of `osinfo` values on Ubuntu 24.04 runners](docs/osinfo-ubuntu-24.04.md).
 
+### boot
+
+The value of `virt-install` `--boot` argument.
+
+Example:
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+          osinfo: archlinux
+          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
+```
+
+Default: `uefi`.
+
+The [man virt-install(1) page](https://github.com/virt-manager/virt-manager/blob/main/man/virt-install.rst#--boot)
+lists supported values. The noteworthy ones are
+
+* `hd` to boot from BIOS;
+* `uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no` to disable Secure Boot.
+
 ## Outputs
 
 ### ip-address

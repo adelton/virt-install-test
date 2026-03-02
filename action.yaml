@@ -10,6 +10,9 @@ inputs:
   osinfo:
     description: The osinfo parameter to virt-install
     default: generic
+  boot:
+    description: The virt-install --boot argument value
+    default: uefi
 outputs:
   ip-address:
     description: IP address that the VM got (if available)
@@ -88,7 +91,7 @@ runs:
           --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --memory 2000 --import \
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
           --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
-          --osinfo "$INPUT_OSINFO" --boot uefi
+          --osinfo "$INPUT_OSINFO" --boot "$INPUT_BOOT"
         )
         echo '::group::domain XML'
         virsh dumpxml "$INPUT_VM_NAME"
@@ -97,6 +100,7 @@ runs:
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
         INPUT_OSINFO: ${{ inputs.osinfo }}
+        INPUT_BOOT: ${{ inputs.boot }}
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: bash
     - run: |
