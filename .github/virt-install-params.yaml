@@ -40,6 +40,8 @@ virt-install:
       inventory: tests/inventory/alpine-linux-3.23
       boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
       secure-boot-check: secure-boot=no,enrolled-keys=no
+      virt-customize: >
+        --run-command 'sed -i "s/^root:!\\*:/root:*:/" /etc/shadow'
 
   osinfo: linux2024
 
