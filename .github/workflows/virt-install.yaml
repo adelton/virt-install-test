@@ -29,19 +29,20 @@ jobs:
         with:
           disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
           osinfo: almalinux10
-          boot: hd
+          boot: uefi
       - run: ssh root@vm1.example.com cat /etc/os-release
       - run: ssh root@vm1.example.com ip a
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: vm1.example.com
-          condition: secure-boot=missing,enrolled-keys=missing
+          condition: secure-boot=yes,enrolled-keys=yes
       - run: virsh destroy vm1.example.com ; virsh undefine --nvram vm1.example.com
       - run: rm -f ~/.ssh/known_hosts
       - uses: ./
         with:
           disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
           osinfo: almalinux10
+          boot: uefi
       - run: ssh root@vm1.example.com cat /etc/os-release
       - run: ssh root@vm1.example.com ip a
       - uses: ./.github/actions/secure-boot-check
@@ -58,20 +59,21 @@ jobs:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2
           vm-name: fedora-42.example.test
           osinfo: fedora42
-          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
+          boot: uefi
       - run: ssh root@fedora-42.example.test cat /etc/os-release
       - run: ssh root@fedora-42.example.test dnf install -y net-tools
       - run: ssh root@fedora-42.example.test netstat -ln
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: fedora-42.example.test
-          condition: secure-boot=no,enrolled-keys=no
+          condition: secure-boot=yes,enrolled-keys=yes
       - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
       - uses: ./
         with:
           disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
           vm-name: fedora-43.example.test
           osinfo: fedora42
+          boot: uefi
       - run: ssh root@fedora-43.example.test cat /etc/os-release
       - uses: ./.github/actions/secure-boot-check
         with:
@@ -87,6 +89,7 @@ jobs:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
           vm-name: ubuntu.example.test
           osinfo: ubuntu24.04
+          boot: uefi
       - run: ssh root@ubuntu.example.test cat /etc/os-release
       - run: virsh dumpxml ubuntu.example.test
       - uses: ./.github/actions/secure-boot-check
@@ -98,6 +101,7 @@ jobs:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
           vm-name: ubuntu-2.example.test
           osinfo: ubuntu24.04
+          boot: uefi
         id: run-ubuntu-2
       - run: ssh root@ubuntu-2.example.test cat /etc/os-release
       - run: ssh root@ubuntu.example.test 'ssh-keygen -N "" -f ~/.ssh/id_rsa'
@@ -117,7 +121,7 @@ jobs:
           disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
           vm-name: arch.example.test
           osinfo: archlinux
-          boot: hd
+          boot: uefi
       - run: ssh root@arch.example.test cat /etc/os-release
       - run: virsh dumpxml arch.example.test
       - uses: ./.github/actions/secure-boot-check
@@ -131,7 +135,7 @@ jobs:
           disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
           vm-name: arch.example.test
           osinfo: archlinux
-          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
+          boot: uefi
       - run: ssh root@arch.example.test cat /etc/os-release
       - run: virsh dumpxml arch.example.test
       - uses: ./.github/actions/secure-boot-check
