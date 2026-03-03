@@ -70,6 +70,7 @@ jobs:
         with:
           vm-name: fedora-42.example.test
           condition: secure-boot=no,enrolled-keys=no
+      - run: virsh destroy fedora-42.example.test
       - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
       - uses: ./
         with:
