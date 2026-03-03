@@ -56,6 +56,18 @@ jobs:
     if: inputs.disk-url == ''
     steps:
       - uses: actions/checkout@v6
+      - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
+      - uses: ./
+        with:
+          disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
+          vm-name: fedora-43.example.test
+          osinfo: fedora42
+          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
+      - run: ssh root@fedora-43.example.test cat /etc/os-release
+      - uses: ./.github/actions/secure-boot-check
+        with:
+          vm-name: fedora-43.example.test
+          condition: secure-boot=no,enrolled-keys=no
       - uses: ./
         with:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2
@@ -69,19 +81,6 @@ jobs:
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: fedora-42.example.test
-          condition: secure-boot=no,enrolled-keys=no
-      - run: virsh destroy fedora-42.example.test
-      - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
-      - uses: ./
-        with:
-          disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
-          vm-name: fedora-43.example.test
-          osinfo: fedora42
-          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
-      - run: ssh root@fedora-43.example.test cat /etc/os-release
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: fedora-43.example.test
           condition: secure-boot=no,enrolled-keys=no
   virt-install-ubuntu:
     runs-on: ubuntu-24.04-arm
