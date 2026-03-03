@@ -23,7 +23,7 @@ on:
 
 jobs:
   virt-install-almalinux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: inputs.disk-url == ''
     steps:
       - uses: actions/checkout@v6
@@ -44,7 +44,6 @@ jobs:
       - uses: ./
         with:
           disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.aarch64.qcow2
-          arch: aarch64
           osinfo: almalinux10
       - run: ssh root@vm1.example.com cat /etc/os-release
       - run: ssh root@vm1.example.com ip a
@@ -53,7 +52,7 @@ jobs:
           vm-name: vm1.example.com
           condition: secure-boot=yes,enrolled-keys=yes
   virt-install-fedora:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: inputs.disk-url == ''
     steps:
       - uses: actions/checkout@v6
@@ -75,7 +74,6 @@ jobs:
       - uses: ./
         with:
           disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
-          arch: aarch64
           vm-name: fedora-43.example.test
           osinfo: fedora42
           boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
@@ -85,7 +83,7 @@ jobs:
           vm-name: fedora-43.example.test
           condition: secure-boot=no,enrolled-keys=no
   virt-install-ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: inputs.disk-url == ''
     steps:
       - uses: actions/checkout@v6
@@ -104,7 +102,6 @@ jobs:
       - uses: ./
         with:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
-          arch: aarch64
           vm-name: ubuntu-2.example.test
           osinfo: ubuntu24.04
         id: run-ubuntu-2
@@ -117,13 +114,14 @@ jobs:
           vm-name: ubuntu-2.example.test
           condition: secure-boot=yes,enrolled-keys=yes
   virt-install-arch-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: inputs.disk-url == ''
     steps:
       - uses: actions/checkout@v6
       - uses: ./
         with:
           disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+          arch: x86_64
           vm-name: arch.example.test
           osinfo: archlinux
           boot: hd
@@ -138,6 +136,7 @@ jobs:
       - uses: ./
         with:
           disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+          arch: x86_64
           vm-name: arch.example.test
           osinfo: archlinux
           boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
@@ -149,7 +148,7 @@ jobs:
           condition: secure-boot=no,enrolled-keys=no
 
   virt-install-manual:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: inputs.disk-url != ''
     steps:
       - uses: actions/checkout@v6

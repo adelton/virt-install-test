@@ -47,6 +47,11 @@ runs:
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
       if: inputs.arch == 'aarch64' && steps.uname.outputs.uname == 'x86_64'
     - run: |
+        sudo apt install qemu-system-x86
+      shell: |
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; exec {0}"
+      if: inputs.arch == 'x86_64' && steps.uname.outputs.uname == 'aarch64'
+    - run: |
         mkdir -p virt-install-images/base
         FILENAME=
         if [[ "$INPUT_DISK_URL" =~ ^file: ]] ; then
