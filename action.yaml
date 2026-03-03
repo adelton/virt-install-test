@@ -69,6 +69,8 @@ runs:
             echo 'disable_root: false'
             echo 'ssh_authorized_keys:'
             sed 's/^/  - /' ~/.ssh/id_rsa.pub
+            echo 'runcmd:'
+            echo " - [sed, -i, 's/^root:!\*:/root:*:/', /etc/shadow]"
           ) | tee user-data
           genisoimage -output "$INPUT_VM_NAME"-cloud-init.iso -volid cidata -joliet -rock user-data meta-data
         )
