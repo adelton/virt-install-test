@@ -20,136 +20,135 @@ on:
         description: Command to run in the VM
 
 jobs:
-  virt-install-almalinux:
+  test-plan:
+    name: Generate test plan
     runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
+    timeout-minutes: 1
+    outputs:
+      matrix-run: ${{ steps.produce-matrix.outputs.matrix-run }}
+      vm-name: ${{ steps.produce-matrix.outputs.vm-name }}
+      vm-name-2: ${{ steps.produce-matrix.outputs.vm-name-2 }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: produce-matrix
+        run: |
+          if [ -n "$INPUT_DISK_URL" ] ; then
+              cat <<EOS | yq . -o json -
+                virt-install:
+                  disk-url:
+                    $INPUT_DISK_URL :
+                      name: ${INPUT_DISK_URL##*/}
+                      osinfo: $INPUT_OSINFO
+                      boot: $INPUT_BOOT
+          EOS
+          else
+              yq . -o json .github/virt-install-params.yaml
+          fi \
+              | tee /dev/stderr \
+              | jq -cf ./ci/generate-test-matrix.jq \
+              | tee .github/virt-install.json \
+              | ( echo -n 'matrix-run=' >> $GITHUB_OUTPUT ; tee -a $GITHUB_OUTPUT )
+          jq -sr -f ./ci/test-matrix-to-html.jq < .github/virt-install.json >> $GITHUB_STEP_SUMMARY
+          if [ -z "$INPUT_VM_NAME" ] ; then
+              INPUT_VM_NAME=machine.example.test
+          fi
+          echo "vm-name=$INPUT_VM_NAME" >> $GITHUB_OUTPUT
+          VM_NAME2="${INPUT_VM_NAME/./-2.}"
+          if [ "$INPUT_VM_NAME" == "$VM_NAME2" ] ; then
+              VM_NAME2="$INPUT_VM_NAME-2"
+          fi
+          echo "vm-name-2=$VM_NAME2" >> $GITHUB_OUTPUT
+        shell: bash -euxo pipefail {0}
+        env:
+          INPUT_DISK_URL: ${{ inputs.disk-url }}
+          INPUT_OSINFO: ${{ inputs.osinfo }}
+          INPUT_BOOT: ${{ inputs.boot }}
+          INPUT_VM_NAME: ${{ inputs.vm-name }}
+  virt-install:
+    runs-on: ubuntu-latest
+    needs: [ test-plan ]
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.test-plan.outputs.matrix-run) }}
     steps:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
-          osinfo: almalinux10
-          boot: hd
+          disk-url: ${{ matrix.disk-url }}
+          vm-name: ${{ needs.test-plan.outputs.vm-name }}
+          osinfo: ${{ matrix.osinfo }}
+          boot: ${{ matrix.boot }}
       - uses: ./.github/actions/inventory
         with:
-          vm-name: vm1.example.com
-          compare-dir: tests/inventory/almalinux-10
+          vm-name: ${{ needs.test-plan.outputs.vm-name }}
+          compare-dir: ${{ matrix.inventory }}
+        if: inputs.disk-url == ''
       - uses: ./.github/actions/secure-boot-check
         with:
-          vm-name: vm1.example.com
-          condition: secure-boot=missing,enrolled-keys=missing
-      - run: virsh destroy vm1.example.com ; virsh undefine --nvram vm1.example.com
-      - run: rm -f ~/.ssh/known_hosts
+          vm-name: ${{ needs.test-plan.outputs.vm-name }}
+          condition: ${{ matrix.secure-boot-check }}
+      - run: ssh root@'${{ needs.test-plan.outputs.vm-name }}' "$INPUT_COMMAND"
+        if: inputs.command != ''
+        env:
+          INPUT_COMMAND: ${{ inputs.command }}
+
+      - run: |
+          virsh destroy '${{ needs.test-plan.outputs.vm-name }}'
+          virsh undefine --nvram '${{ needs.test-plan.outputs.vm-name }}'
+          rm -f ~/.ssh/known_hosts
+        if: matrix.second-machine == 'recreate' || matrix.second-machine == 'local-file'
       - uses: ./
         with:
-          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
-          osinfo: almalinux10
+          disk-url: ${{ matrix.disk-url }}
+          vm-name: ${{ needs.test-plan.outputs.vm-name }}
+          osinfo: ${{ matrix.osinfo }}
+          boot: ${{ matrix.boot }}
+        if: matrix.second-machine == 'recreate'
+      - id: fetch-image
+        run: |
+          curl -LO '${{ matrix.disk-url }}'
+          echo "local-image-file=${DISK_URL##*/}" | tee -a $GITHUB_OUTPUT
+        if: matrix.second-machine == 'local-file'
+        env:
+          DISK_URL: ${{ matrix.disk-url }}
+      - uses: ./
+        with:
+          disk-url: file://${{ github.workspace }}/${{ steps.fetch-image.outputs.local-image-file }}
+          vm-name: ${{ needs.test-plan.outputs.vm-name }}
+          osinfo: ${{ matrix.osinfo }}
+          boot: ${{ matrix.boot }}
+        if: matrix.second-machine == 'local-file'
       - uses: ./.github/actions/inventory
         with:
-          vm-name: vm1.example.com
-          compare-dir: tests/inventory/almalinux-10
+          vm-name: ${{ needs.test-plan.outputs.vm-name }}
+          compare-dir: ${{ matrix.inventory }}
+        if: matrix.second-machine == 'recreate' || matrix.second-machine == 'local-file'
       - uses: ./.github/actions/secure-boot-check
         with:
-          vm-name: vm1.example.com
-          condition: secure-boot=yes,enrolled-keys=yes
-  virt-install-fedora:
-    runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./
+          vm-name: ${{ needs.test-plan.outputs.vm-name }}
+          condition: ${{ matrix.secure-boot-check }}
+        if: matrix.second-machine == 'recreate' || matrix.second-machine == 'local-file'
+
+      - id: run-machine-2
+        uses: ./
         with:
-          disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2
-          vm-name: fedora-42.example.test
-          osinfo: fedora42
-          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: fedora-42.example.test
-          compare-dir: tests/inventory/fedora-42
+          disk-url: ${{ matrix.disk-url }}
+          vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
+          osinfo: ${{ matrix.osinfo }}
+          boot: ${{ matrix.boot }}
+        if: matrix.second-machine == 'multihost'
+      - run: |
+          ssh root@'${{ needs.test-plan.outputs.vm-name }}' 'ssh-keygen -N "" -f ~/.ssh/id_rsa'
+          ssh root@'${{ needs.test-plan.outputs.vm-name }}' 'cat ~/.ssh/id_rsa.pub' | ssh root@'${{ needs.test-plan.outputs.vm-name-2 }}' 'umask 077 && cat > ~/.ssh/authorized_keys'
+          ssh root@'${{ needs.test-plan.outputs.vm-name }}' "ssh -o 'StrictHostKeyChecking accept-new' root@'${{ steps.run-machine-2.outputs.ip-address }}' ip a"
+        shell: bash -euxo pipefail {0}
+        if: matrix.second-machine == 'multihost'
       - uses: ./.github/actions/secure-boot-check
         with:
-          vm-name: fedora-42.example.test
-          condition: secure-boot=no,enrolled-keys=no
-      - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
-      - uses: ./
-        with:
-          disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
-          vm-name: fedora-43.example.test
-          osinfo: fedora42
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: fedora-43.example.test
-          compare-dir: tests/inventory/fedora-43
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: fedora-43.example.test
-          condition: secure-boot=yes,enrolled-keys=yes
-  virt-install-ubuntu:
-    runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./
-        with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-amd64.img
-          vm-name: ubuntu.example.test
-          osinfo: ubuntu24.04
-      - run: virsh dumpxml ubuntu.example.test
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: ubuntu.example.test
-          compare-dir: tests/inventory/ubuntu-24.04
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: ubuntu.example.test
-          condition: secure-boot=yes,enrolled-keys=yes
-      - uses: ./
-        with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-amd64.img
-          vm-name: ubuntu-2.example.test
-          osinfo: ubuntu24.04
-        id: run-ubuntu-2
-      - run: ssh root@ubuntu.example.test 'ssh-keygen -N "" -f ~/.ssh/id_rsa'
-      - run: ssh root@ubuntu.example.test 'cat ~/.ssh/id_rsa.pub' | ssh root@ubuntu-2.example.test 'umask 077 && cat > ~/.ssh/authorized_keys'
-      - run: ssh root@ubuntu.example.test "ssh -o 'StrictHostKeyChecking accept-new' root@${{ steps.run-ubuntu-2.outputs.ip-address }} ip a"
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: ubuntu-2.example.test
-          condition: secure-boot=yes,enrolled-keys=yes
-  virt-install-arch-linux:
-    runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./
-        with:
-          disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
-          vm-name: arch.example.test
-          osinfo: archlinux
-          boot: hd
-      - run: virsh dumpxml arch.example.test
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: arch.example.test
-          compare-dir: tests/inventory/arch-linux-latest
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: arch.example.test
-          condition: secure-boot=missing,enrolled-keys=missing
-      - run: virsh destroy arch.example.test ; virsh undefine arch.example.test
-      - run: rm -f ~/.ssh/known_hosts
-      - uses: ./
-        with:
-          disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
-          vm-name: arch.example.test
-          osinfo: archlinux
-          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
-      - run: virsh dumpxml arch.example.test
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: arch.example.test
-          condition: secure-boot=no,enrolled-keys=no
+          vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
+          condition: ${{ matrix.secure-boot-check }}
+        if: matrix.second-machine == 'multihost'
 
   virt-install-defaults:
     runs-on: ubuntu-latest
@@ -167,23 +166,3 @@ jobs:
           # no Secure Boot even with the default --boot=uefi
           # because of the --osinfo=generic default
           condition: secure-boot=no,enrolled-keys=no
-
-  virt-install-manual:
-    runs-on: ubuntu-latest
-    if: inputs.disk-url != ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./
-        with:
-          disk-url: ${{ inputs.disk-url }}
-          vm-name: ${{ inputs.vm-name }}
-          osinfo: ${{ inputs.osinfo }}
-          boot: ${{ inputs.boot }}
-      - run: ssh root@'${{ inputs.vm-name }}' "$INPUT_COMMAND"
-        if: inputs.command != ''
-        env:
-          INPUT_COMMAND: ${{ inputs.command }}
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: ${{ inputs.vm-name }}
-          condition:
