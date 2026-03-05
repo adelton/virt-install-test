@@ -1,0 +1,58 @@
+
+def xcontains_any($list):
+	. as $input
+	| [ $list[] | to_entries | map($input[.key] == .value) | all ]
+	| any
+;
+
+def random_select($count; $at_least_once):
+	if $count <= 0 or length <= 0 then empty
+	else
+		. as $in
+		| reduce ($at_least_once | keys[]) as $k ($in;
+			. as $iin
+			| $at_least_once[$k]
+			| until(length < 1 or (.[0] as $kk | any($iin[] | select(xcontains_any([ { $k: $kk } ])))); .[1:])
+			| . as $sel
+			| if $sel | length > 0
+				then [ $iin[] | select(xcontains_any([ { $k: $sel[0] } ])) ]
+				else $iin
+				end
+		)
+		| .[ now * 1000000 % length ] as $row
+		| $row,
+		($in - [ $row ]
+			| random_select($count - 1;
+				reduce ($row | to_entries[]) as $e ($at_least_once;
+					.[$e.key] -= [ $e.value ]))
+				| del(..|select(. == [])
+			)
+		)
+	end
+;
+
+.["virt-install"]
+| . as $virtinstall
+| ( pick(.["disk-url"], .osinfo, .boot) ) as $data
+
+|
+[
+[ $data | with_entries(select(.value | strings)) ]
+| reduce ($data | to_entries[] | select(.value | arrays)) as $i (.; [ .[] + { ($i.key): ($i.value[]) } ])
+| reduce ($data | to_entries[] | select(.value | objects)) as $i (.; [ .[] + ( $i.value | keys[] | { ($i.key): . } + $i.value[.] ) ])
+
+| map(select(xcontains_any($virtinstall.exclude) | not))
+
+| reduce ( .[] | to_entries[] ) as $i ({};
+	if has($i.key) | not
+		then .[ $i.key ] = [ $i.value ]
+		else
+		if .[ $i.key ] | index($i.value) == null
+		then (.[ $i.key ] | (now * 1000000 % (length + 1))) as $random_at
+			| .[ $i.key ] = .[ $i.key ][0:$random_at] + [ $i.value ] + .[ $i.key ][$random_at:]
+		end
+	end) as $at_least_once
+| random_select($virtinstall.count // [ $data[] | select(arrays), select(objects) | length ] | max; $at_least_once)
+]
+| sort_by(.osinfo, .["disk-url"], .boot)
+

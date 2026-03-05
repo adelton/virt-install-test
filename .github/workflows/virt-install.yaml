@@ -20,136 +20,47 @@ on:
         description: Command to run in the VM
 
 jobs:
-  virt-install-almalinux:
+  test-plan:
+    name: Generate test plan
     runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      matrix-run: ${{ steps.produce-matrix.outputs.matrix-run }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: produce-matrix
+        run: |
+          yq . -o json .github/virt-install-params.yaml | jq -cf ./ci/generate-test-matrix.jq \
+              | ( echo -n 'matrix-run=' >> $GITHUB_OUTPUT ; tee -a $GITHUB_OUTPUT )
+  virt-install:
+    runs-on: ${{ matrix.runs-on }}
     if: inputs.disk-url == ''
+    needs: [ test-plan ]
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.test-plan.outputs.matrix-run) }}
     steps:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
-          osinfo: almalinux10
-          boot: hd
+          disk-url: ${{ matrix.disk-url }}
+          osinfo: ${{ matrix.osinfo }}
+          boot: ${{ matrix.boot }}
+        if: matrix.boot != ''
+      - uses: ./
+        with:
+          disk-url: ${{ matrix.disk-url }}
+          osinfo: ${{ matrix.osinfo }}
+        if: matrix.boot == ''
       - uses: ./.github/actions/inventory
         with:
           vm-name: vm1.example.com
-          compare-dir: tests/inventory/almalinux-10
+          compare-dir: ${{ matrix.inventory }}
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: vm1.example.com
-          condition: secure-boot=missing,enrolled-keys=missing
-      - run: virsh destroy vm1.example.com ; virsh undefine --nvram vm1.example.com
-      - run: rm -f ~/.ssh/known_hosts
-      - uses: ./
-        with:
-          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
-          osinfo: almalinux10
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: vm1.example.com
-          compare-dir: tests/inventory/almalinux-10
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: vm1.example.com
-          condition: secure-boot=yes,enrolled-keys=yes
-  virt-install-fedora:
-    runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./
-        with:
-          disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2
-          vm-name: fedora-42.example.test
-          osinfo: fedora42
-          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: fedora-42.example.test
-          compare-dir: tests/inventory/fedora-42
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: fedora-42.example.test
-          condition: secure-boot=no,enrolled-keys=no
-      - run: curl -LO https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
-      - uses: ./
-        with:
-          disk-url: file://${{ github.workspace }}/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
-          vm-name: fedora-43.example.test
-          osinfo: fedora42
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: fedora-43.example.test
-          compare-dir: tests/inventory/fedora-43
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: fedora-43.example.test
-          condition: secure-boot=yes,enrolled-keys=yes
-  virt-install-ubuntu:
-    runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./
-        with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
-          vm-name: ubuntu.example.test
-          osinfo: ubuntu24.04
-      - run: virsh dumpxml ubuntu.example.test
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: ubuntu.example.test
-          compare-dir: tests/inventory/ubuntu-24.04
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: ubuntu.example.test
-          condition: secure-boot=yes,enrolled-keys=yes
-      - uses: ./
-        with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
-          vm-name: ubuntu-2.example.test
-          osinfo: ubuntu24.04
-        id: run-ubuntu-2
-      - run: ssh root@ubuntu.example.test 'ssh-keygen -N "" -f ~/.ssh/id_rsa'
-      - run: ssh root@ubuntu.example.test 'cat ~/.ssh/id_rsa.pub' | ssh root@ubuntu-2.example.test 'umask 077 && cat > ~/.ssh/authorized_keys'
-      - run: ssh root@ubuntu.example.test "ssh -o 'StrictHostKeyChecking accept-new' root@${{ steps.run-ubuntu-2.outputs.ip-address }} ip a"
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: ubuntu-2.example.test
-          condition: secure-boot=yes,enrolled-keys=yes
-  virt-install-arch-linux:
-    runs-on: ubuntu-latest
-    if: inputs.disk-url == ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./
-        with:
-          disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
-          vm-name: arch.example.test
-          osinfo: archlinux
-          boot: hd
-      - run: virsh dumpxml arch.example.test
-      - uses: ./.github/actions/inventory
-        with:
-          vm-name: arch.example.test
-          compare-dir: tests/inventory/arch-linux-latest
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: arch.example.test
-          condition: secure-boot=missing,enrolled-keys=missing
-      - run: virsh destroy arch.example.test ; virsh undefine arch.example.test
-      - run: rm -f ~/.ssh/known_hosts
-      - uses: ./
-        with:
-          disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
-          vm-name: arch.example.test
-          osinfo: archlinux
-          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
-      - run: virsh dumpxml arch.example.test
-      - uses: ./.github/actions/secure-boot-check
-        with:
-          vm-name: arch.example.test
-          condition: secure-boot=no,enrolled-keys=no
+          condition: ${{ matrix.secure-boot-check }}
 
   virt-install-manual:
     runs-on: ubuntu-latest
