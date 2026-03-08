@@ -1,0 +1,28 @@
+name: Get basic information from the VM
+inputs:
+  vm-name:
+    description: Name of the VM (libvirt domain)
+    required: true
+  compare-dir:
+    description: Directory with expected outputs
+    required: true
+runs:
+  using: composite
+  steps:
+    - run: |
+        cd ${{ inputs.compare-dir }}
+        ls *.sh | sort \
+        | while read i ; do
+          scp $i root@${{ inputs.vm-name }}:/tmp/test-$i
+          if [ -f ${i%.sh}.out ] ; then
+            echo -n '::group::diff of: '
+            tail -1 $i
+            diff -u ${i%.sh}.out <( ssh root@${{ inputs.vm-name }} /tmp/test-$i < /dev/null )
+          else
+            echo -n '::group::output of: '
+            tail -1 $i
+            ssh root@${{ inputs.vm-name }} /tmp/test-$i < /dev/null
+          fi
+          echo ::endgroup::
+        done
+      shell: bash -euo pipefail {0}
