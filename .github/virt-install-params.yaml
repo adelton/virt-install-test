@@ -31,3 +31,7 @@ virt-install:
     uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
       secure-boot-check: secure-boot=no,enrolled-keys=no
 
+  exclude:
+    - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+      secure-boot-check: secure-boot=yes,enrolled-keys=yes
+
