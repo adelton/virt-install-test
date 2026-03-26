@@ -40,13 +40,13 @@ def random_select($count; $at_least_once):
 | reduce ($data | to_entries[] | select(.value | arrays)) as $i (.; [ .[] + { ($i.key): ($i.value[]) } ])
 | reduce ($data | to_entries[] | select(.value | objects)) as $i (.; [ .[] + ( $i.value | keys[] | { ($i.key): . } + $i.value[.] ) ])
 
-| reduce ( .[] | to_entries[] ) as $i ({};
+| (reduce ( .[] | to_entries[] ) as $i ({};
 	if has($i.key) | not
 	then .[ $i.key ] = [ $i.value ]
 	elif .[ $i.key ] | index($i.value) == null
 	then (.[ $i.key ] | (now * 1000000 % (length + 1))) as $random_at
 		| .[ $i.key ] = .[ $i.key ][0:$random_at] + [ $i.value ] + .[ $i.key ][$random_at:]
-	end) as $at_least_once
+	end)) as $at_least_once
 
 | random_select($virtinstall.count // ([ $data[] | select(arrays), select(objects) | length ] | max * 2); $at_least_once)
 
