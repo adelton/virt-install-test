@@ -92,7 +92,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-amd64.img
           vm-name: ubuntu.example.test
           osinfo: ubuntu24.04
       - run: virsh dumpxml ubuntu.example.test
@@ -106,7 +106,7 @@ jobs:
           condition: secure-boot=yes,enrolled-keys=yes
       - uses: ./
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-amd64.img
           vm-name: ubuntu-2.example.test
           osinfo: ubuntu24.04
         id: run-ubuntu-2
