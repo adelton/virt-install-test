@@ -3,7 +3,7 @@
 . /etc/os-release
 
 cat <<EOS
-On $PRETTY_NAME runners,
+On $NAME $VERSION_ID runners,
 supported \`osinfo\` parameter values are based
 on the \`osinfo-db\` package, currently in version
 $( dpkg-query -W -f '${Version}\n' osinfo-db 2> /dev/null || rpm -q --qf '%{version}-%{release}\n' osinfo-db ).
