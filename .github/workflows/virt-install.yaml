@@ -151,6 +151,23 @@ jobs:
           vm-name: arch.example.test
           condition: secure-boot=no,enrolled-keys=no
 
+  virt-install-defaults:
+    runs-on: ubuntu-latest
+    if: inputs.disk-url == ''
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./
+        with:
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+      - run: ssh root@vm1.example.com cat /etc/os-release
+      # With default boot (uefi) and osinfo (generic), we get Secure Boot disabled
+      - uses: ./.github/actions/secure-boot-check
+        with:
+          vm-name: vm1.example.com
+          # no Secure Boot even with the default --boot=uefi
+          # because of the --osinfo=generic default
+          condition: secure-boot=no,enrolled-keys=no
+
   virt-install-manual:
     runs-on: ubuntu-latest
     if: inputs.disk-url != ''
