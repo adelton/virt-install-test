@@ -14,6 +14,10 @@ virt-install:
           secure-boot-check: secure-boot=yes,enrolled-keys=yes
         uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
           secure-boot-check: secure-boot=no,enrolled-keys=no
+    https://download.fedoraproject.org/pub/fedora/linux/development/44/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-44-20260330.n.0.aarch64.qcow2 :
+      name: Fedora rawhide
+      osinfo: fedora42
+      inventory: tests/inventory/fedora-44-aarch64
     https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2 :
       name: Fedora 43
       osinfo: fedora42
@@ -60,6 +64,7 @@ virt-install:
   exclude:
     - disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.aarch64.qcow2
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+    - disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
     - disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2
     - disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-arm64.img
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
