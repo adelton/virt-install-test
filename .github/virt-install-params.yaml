@@ -31,6 +31,13 @@ virt-install:
           boot: &boot-no-secure-boot
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
               secure-boot-check: secure-boot=no
+          virt-customize: >
+            --ssh-inject root:file:/home/runner/.ssh/id_rsa.pub
+            --firstboot-command 'restorecon -rvv /root/.ssh'
+            --link /dev/null:/etc/systemd/system/initial-setup.service
+            --mkdir /etc/systemd/system.conf.d
+            --copy-in tests/systemd-device-timeout.conf:/etc/systemd/system.conf.d
+            --no-selinux-relabel
       virt-customize: >
         --ssh-inject root:file:/home/runner/.ssh/id_rsa.pub
         --firstboot-command 'restorecon -rvv /root/.ssh'
@@ -47,6 +54,10 @@ virt-install:
           inventory: tests/inventory/fedora-43-aarch64
           boot:
             <<: *boot-no-secure-boot
+          virt-customize: &systemd-device-timeout >
+            --mkdir /etc/systemd/system.conf.d
+            --copy-in tests/systemd-device-timeout.conf:/etc/systemd/system.conf.d
+            --no-selinux-relabel
     Fedora 42:
       osinfo:
         fedora42:
@@ -67,6 +78,7 @@ virt-install:
           inventory: tests/inventory/fedora-42-aarch64
           boot:
             <<: *boot-no-secure-boot
+          virt-customize: *systemd-device-timeout
     Ubuntu 24.04:
       osinfo: ubuntu24.04
       arch:
