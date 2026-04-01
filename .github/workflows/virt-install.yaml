@@ -16,6 +16,8 @@ on:
       boot:
         description: The virt-install --boot argument value
         default: uefi
+      virt-customize:
+        description: Arguments to virt-customize to be run on the image
       command:
         description: Command to run in the VM
 
@@ -40,6 +42,7 @@ jobs:
                       name: ${INPUT_DISK_URL##*/}
                       osinfo: $INPUT_OSINFO
                       boot: $INPUT_BOOT
+                      virt-customize: $INPUT_VIRT_CUSTOMIZE
           EOS
           else
               yq . -o json .github/virt-install-params.yaml
@@ -64,6 +67,7 @@ jobs:
           INPUT_OSINFO: ${{ inputs.osinfo }}
           INPUT_BOOT: ${{ inputs.boot }}
           INPUT_VM_NAME: ${{ inputs.vm-name }}
+          INPUT_VIRT_CUSTOMIZE: ${{ inputs.virt-customize }}
   virt-install:
     runs-on: ubuntu-latest
     needs: [ test-plan ]
@@ -79,6 +83,7 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
+          virt-customize: ${{ matrix.virt-customize }}
       - uses: ./.github/actions/inventory
         with:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
@@ -104,6 +109,7 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
+          virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'recreate'
       - id: fetch-image
         run: |
@@ -118,6 +124,7 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
+          virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'local-file'
       - uses: ./.github/actions/inventory
         with:
@@ -137,6 +144,7 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
+          virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'multihost'
       - run: |
           ssh root@'${{ needs.test-plan.outputs.vm-name }}' 'ssh-keygen -N "" -f ~/.ssh/id_rsa'

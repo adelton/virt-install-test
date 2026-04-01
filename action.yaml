@@ -13,6 +13,8 @@ inputs:
   boot:
     description: The virt-install --boot argument value
     default: uefi
+  virt-customize:
+    description: Arguments to virt-customize to be run on the image (optional)
 outputs:
   ip-address:
     description: IP address that the VM got (if available)
@@ -36,6 +38,10 @@ runs:
         # to get the libvirtd.service which configures virbr0
       shell: |
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
+    - run: sudo apt install libguestfs-tools
+      shell: |
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
+      if: inputs.virt-customize != ''
     - run: |
         mkdir -p virt-install-images/base
         FILENAME=
@@ -57,9 +63,22 @@ runs:
         INPUT_DISK_URL: ${{ inputs.disk-url }}
         INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: bash -euxo pipefail {0}
+    - run: sudo chmod a+r /boot/vmlinuz-*
+      shell: bash
+      if: inputs.virt-customize != ''
     - run: |
         [ -f ~/.ssh/id_rsa ] || ssh-keygen -N '' -f ~/.ssh/id_rsa
       shell: bash
+    - run: |
+        # virt-customize
+        printf '%s' "$INPUT_VIRT_CUSTOMIZE" | xargs \
+          virt-customize -v -x --no-network -a virt-install-images/"$INPUT_VM_NAME".qcow2
+      shell: |
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; echo $( tail -1 {0} ) \"$INPUT_VIRT_CUSTOMIZE\" ; trap 'echo ::endgroup::' exit ; chmod u+x {0} ; bash -euo pipefail {0}"
+      env:
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
+        INPUT_VIRT_CUSTOMIZE: ${{ inputs.virt-customize }}
+      if: inputs.virt-customize != ''
     - run: |
         (
           cd virt-install-images

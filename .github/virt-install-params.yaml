@@ -5,6 +5,15 @@ virt-install:
       name: AlmaLinux 10
       osinfo: almalinux10
       inventory: tests/inventory/almalinux-10
+    https://download.fedoraproject.org/pub/fedora/linux/releases/43/Server/x86_64/images/Fedora-Server-Guest-Generic-43-1.6.x86_64.qcow2 :
+      name: Fedora 43 (no cloud-init)
+      osinfo: fedora42
+      inventory: tests/inventory/fedora-43-server
+      virt-customize: >
+        --ssh-inject root:file:/home/runner/.ssh/id_rsa.pub
+        --firstboot-command 'restorecon -rvv /root/.ssh'
+        --link /dev/null:/etc/systemd/system/initial-setup.service
+        --no-selinux-relabel
     https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2 :
       name: Fedora 43
       osinfo: fedora42

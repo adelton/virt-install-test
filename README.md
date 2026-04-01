@@ -27,6 +27,7 @@ Before running `virt-install`, this action
 - installs the needed packages;
 - fetches the image from the provided URL (input `disk-url`);
 - generates an SSH key;
+- optionally runs a `virt-customize` command;
 - creates a cloud-init config on a
   [CD-ROM filesystem](https://docs.cloud-init.io/en/latest/reference/datasources/nocloud.html#source-2-drive-with-labeled-filesystem)
   to set up [SSH authorized_keys and enable SSH access to
@@ -123,6 +124,36 @@ lists supported values. The noteworthy ones are
 
 * `hd` to boot from BIOS;
 * `uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no` to disable Secure Boot.
+
+### virt-customize
+
+Command-line argument to `virt-customize` to be run on the image
+before `virt-install`. It can be used for example with images that do
+not include cloud-init, to configure the SSH keys; or to make other
+minor customizations to the image before running the virtual machine.
+
+Example:
+
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Server/x86_64/images/Fedora-Server-Guest-Generic-43-1.6.x86_64.qcow2
+          osinfo: fedora42
+          virt-customize: >
+            --ssh-inject root:file:/home/runner/.ssh/id_rsa.pub
+            --firstboot-command 'restorecon -rvv /root/.ssh'
+            --link /dev/null:/etc/systemd/system/initial-setup.service
+            --no-selinux-relabel
+```
+
+The `virt-customize` runs a temporary virtual machine to edit the image.
+It uses host's kernel which in case of GitHub Actions' hosted Ubuntu
+runners will not run with SELinux enabled. If the operating system in
+the virtual machine runs with SELinux enabled, relabel of added files
+might be needed, either using `--selinux-relabel`, or a firstboot command
+as shown in the example above.
+
+Default: unset, meaning `virt-customize` will not be run.
 
 ## Outputs
 
