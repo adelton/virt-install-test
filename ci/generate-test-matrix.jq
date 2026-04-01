@@ -38,7 +38,14 @@ def random_select($count; $at_least_once):
 |
 [ $data | with_entries(select(.value | strings)) ]
 | reduce ($data | to_entries[] | select(.value | arrays)) as $i (.; [ .[] + { ($i.key): ($i.value[]) } ])
-| reduce ($data | to_entries[] | select(.value | objects)) as $i (.; [ .[] + ( $i.value | keys[] | { ($i.key): . } + $i.value[.] ) ])
+| map(. + ($data | with_entries(select(.value | objects))))
+|
+[ .[]
+	| until(([ .[] | objects ] | length) < 1;
+		[ to_entries[] | select(.value | objects) ][0] as $i
+		| . + ( $i.value | keys[] | { ($i.key): . } + $i.value[.] )
+		)
+]
 
 | map(select(. as $in | any(($virtinstall.exclude // [])[] as $e | $in | xcontains($e)) | not))
 
