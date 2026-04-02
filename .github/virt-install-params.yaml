@@ -17,6 +17,10 @@ virt-install:
       name: Ubuntu 24.04
       osinfo: ubuntu24.04
       inventory: tests/inventory/ubuntu-24.04
+    https://cloud.debian.org/images/cloud/trixie/20260316-2418/debian-13-genericcloud-amd64-20260316-2418.qcow2 :
+      name: Debian 13
+      osinfo: debian13
+      inventory: tests/inventory/debian-13
     https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2 :
       name: Arch Linux latest
       osinfo: archlinux
@@ -42,4 +46,6 @@ virt-install:
   exclude:
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
       secure-boot-check: secure-boot=yes,enrolled-keys=yes
+    - disk-url: https://cloud.debian.org/images/cloud/trixie/20260316-2418/debian-13-genericcloud-amd64-20260316-2418.qcow2
+      boot: hd
 
