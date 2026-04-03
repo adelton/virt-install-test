@@ -29,13 +29,13 @@ runs:
     - run: |
         sudo apt update
       shell: |
-        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; bash {0}"
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
     - run: |
         sudo apt install genisoimage libvirt-daemon-system virtinst expect
         # we install libvirt-daemon-system and not just libvirt-daemon
         # to get the libvirtd.service which configures virbr0
       shell: |
-        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; bash {0}"
+        bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
     - run: |
         mkdir -p virt-install-images/base
         FILENAME=
@@ -108,7 +108,7 @@ runs:
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: |
-        bash -euo pipefail -c "echo ::group::output of: virsh console ${{ inputs.vm-name }} ; trap 'echo ::endgroup::' exit ; bash {0}"
+        bash -euo pipefail -c "echo ::group::output of: virsh console ${{ inputs.vm-name }} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
     - run: |
         MAC=$( virsh --connect qemu:///session dumpxml "$INPUT_VM_NAME" | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
         virsh --connect qemu:///system net-dhcp-leases default --mac $MAC
