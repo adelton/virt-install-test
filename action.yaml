@@ -89,7 +89,7 @@ runs:
             echo 'ssh_authorized_keys:'
             sed 's/^/  - /' ~/.ssh/id_rsa.pub
           ) | tee user-data
-          genisoimage -output "$INPUT_VM_NAME"-cloud-init.iso -volid cidata -joliet -rock user-data meta-data
+          genisoimage -output "$INPUT_VM_NAME"-cloud-init.iso -volid cidata -joliet -rock -input-charset utf-8 user-data meta-data
         )
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
