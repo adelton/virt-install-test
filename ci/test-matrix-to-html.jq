@@ -26,7 +26,7 @@ def linebreaks:
 
 # raw hash of hashes with display string for combinations we will run
 | reduce .[] as $r ({}; .[ $r.boot | linebreaks ][ $r["secure-boot-check"] // "(not checked)" | linebreaks ]
-	[ $r.["second-machine"] // "(none)" ][ $r.name ][ $r.osinfo ]  = "🔷")
+	[ $r.["second-machine"] // "(none)" ][ $r.name ][ $r.osinfo ][ $r.arch[0:1] ] = "🔷")
 | . as $data
 
 # set the top data (the rows in the table) as sorted to_entries
@@ -55,7 +55,7 @@ def linebreaks:
 ( "Boot" | th($ncolstart + 1; 1) ),
 ( "Secure Boot" | th($ncolstart + 1; 1) ),
 ( "Second machine" | th($ncolstart + 1; 1) ),
-( "Image / osinfo" | th(1; [ $columns | .. | select(.depth? == $maxdepth) ] | length ) ),
+( "Image / osinfo / arch" | th(1; [ $columns | .. | select(.depth? == $maxdepth) ] | length ) ),
 "    </tr>",
 
 (

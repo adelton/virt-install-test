@@ -54,10 +54,10 @@ def random_select($count; $at_least_once):
 		| .[ $i.key ] = .[ $i.key ][0:$random_at] + [ $i.value ] + .[ $i.key ][$random_at:]
 	)) as $at_least_once
 
-| random_select($virtinstall.count // ([ $data[] | select(arrays), select(objects) | length ] | max * 2); $at_least_once)
+| random_select($virtinstall.count // ([ $data[] | select(arrays), select(objects) | length ] | max * 3); $at_least_once)
 
 # order keys in object for better workflow run display
-| map(. as $in | pick(.name, .boot, .["second-machine"]) + $in)
+| map(. as $in | pick(.name, .arch, .boot, .["second-machine"]) + $in)
 
 | sort_by(.name, .boot, .["second-machine"])
 

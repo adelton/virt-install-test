@@ -7,6 +7,13 @@ on:
     inputs:
       disk-url:
         description: URL of disk to use
+      arch:
+        description: Runner architecture
+        type: choice
+        options:
+          - x86_64
+          - aarch64
+        default: x86_64
       vm-name:
         description: Name of the VM (libvirt domain)
         default: vm1.example.com
@@ -40,6 +47,7 @@ jobs:
                   name:
                     ${INPUT_DISK_URL##*/}:
                       disk-url: $INPUT_DISK_URL
+                      arch: $INPUT_ARCH
                       osinfo: $INPUT_OSINFO
                       boot: $INPUT_BOOT
                       virt-customize: $INPUT_VIRT_CUSTOMIZE
@@ -64,12 +72,13 @@ jobs:
         shell: bash -euxo pipefail {0}
         env:
           INPUT_DISK_URL: ${{ inputs.disk-url }}
+          INPUT_ARCH: ${{ inputs.arch }}
           INPUT_OSINFO: ${{ inputs.osinfo }}
           INPUT_BOOT: ${{ inputs.boot }}
           INPUT_VM_NAME: ${{ inputs.vm-name }}
           INPUT_VIRT_CUSTOMIZE: ${{ inputs.virt-customize }}
   virt-install:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04${{ (matrix.arch == 'aarch64' && '-arm') || (matrix.arch == 'x86_64' && '') }}
     needs: [ test-plan ]
     strategy:
       fail-fast: false
@@ -159,18 +168,27 @@ jobs:
         if: matrix.second-machine == 'multihost'
 
   virt-install-defaults:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runs-on: ubuntu-24.04
+            disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+            secure-boot-check: secure-boot=no
+          - runs-on: ubuntu-24.04-arm
+            disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
+            secure-boot-check: secure-boot=yes
     if: inputs.disk-url == ''
     steps:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: ${{ matrix.disk-url }}
       - run: ssh root@vm1.example.com cat /etc/os-release
-      # With default boot (uefi) and osinfo (generic), we get Secure Boot disabled
+      # With default boot (uefi) and osinfo (generic), we get Secure Boot disabled on x86_64
+      # but enabled on aarch64
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: vm1.example.com
-          # no Secure Boot even with the default --boot=uefi
-          # because of the --osinfo=generic default
-          condition: secure-boot=no
+          condition: ${{ matrix.secure-boot-check }}

@@ -9,19 +9,27 @@ This action fetches a VM image from a URL provided as input, then creates
 and runs a virtual machine using
 [virt-install](https://github.com/virt-manager/virt-manager/blob/main/man/virt-install.rst).
 
-Example of getting an AlmaLinux 10 VM:
+Examples of getting AlmaLinux 10 virtual machines:
 ```
 jobs:
-  virt-install-almalinux:
+  virt-install-almalinux-x86_64:
     runs-on: ubuntu-latest
     steps:
       - uses: adelton/virt-install@master
         with:
           disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.x86_64.qcow2
+      - run: ssh root@vm1.example.com cat /proc/cmdline
+  virt-install-almalinux-aarch64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.aarch64.qcow2
       - run: ssh root@vm1.example.com cat /etc/os-release
 ```
 
-This action was tested on the `ubuntu-24.04` (`ubuntu-latest`) runners.
+This action has been tested on GitHub hosted runners
+`ubuntu-24.04` (`ubuntu-latest`) and `ubuntu-24.04-arm`.
 
 Before running `virt-install`, this action
 - installs the needed packages;
