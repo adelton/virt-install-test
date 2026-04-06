@@ -33,7 +33,7 @@ def random_select($count; $at_least_once):
 
 .["virt-install"]
 | . as $virtinstall
-| ( pick(.["disk-url"], .osinfo, .boot, .["second-machine"]) ) as $data
+| ( pick(.name, .osinfo, .boot, .["second-machine"]) ) as $data
 
 |
 [ $data | with_entries(select(.value | strings)) ]
