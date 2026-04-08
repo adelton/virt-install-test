@@ -20,51 +20,75 @@ def linebreaks:
 	| gsub("(?<c>[.=])"; "\u200b\(.c)")
 ;
 
-flatten
-| . as $data
-| reduce .[] as $r ({}; .[ $r.name ][ $r.osinfo ] = 1)
-| with_entries( .value = ( .value | keys | sort ) )
-| . as $dist
-| $data
-| reduce .[] as $r ({}; .[ $r.boot + " / " + ($r["secure-boot-check"] // "(not checked)") | linebreaks ]
+3 as $ncolstart
+
+| flatten
+
+# raw hash of hashes with display string for combinations we will run
+| reduce .[] as $r ({}; .[ $r.boot | linebreaks ][ $r["secure-boot-check"] // "(not checked)" | linebreaks ]
 	[ $r.["second-machine"] // "(none)" ][ $r.name ][ $r.osinfo ]  = "🔷")
 | . as $data
+
+# set the top data (the rows in the table) as sorted to_entries
+| [ paths | select(length < $ncolstart) ] + [[]] | sort_by(-length)
+| reduce .[] as $p ($data; getpath($p) |= (to_entries | sort_by(.key) | map(.depth = ($p | length))))
+| . as $data
+
+# use multiplication to retrieve combinations that will define the columns
+| [ paths(type == "object") | select(length == $ncolstart * 2) ]
+| reduce .[] as $p ({}; . * ($data | getpath($p)))
+
+# turn the colum headers into sorted to_entries
+| walk(if type == "object" then to_entries | sort_by(.key) else . end)
+| . as $columns
+# add the .depth for columns
+| reduce (paths(type == "object")) as $p ($columns; setpath($p + [ "depth" ]; ($p | length - 1) / 2)) as $columns
+# and store the maximal depth
+| ( [ $columns | .. | .depth? ] | max) as $maxdepth
+
 |
 
 "<table>",
 "  <thead>",
 
 "    <tr>",
-( "Boot / Secure Boot" | th(3; 1) ),
-( "Second machine" | th(3; 1) ),
-( "Image" | th(1; [ $dist | to_entries | .[] | .value | length ] | add ) ),
+( "Boot" | th($ncolstart + 1; 1) ),
+( "Secure Boot" | th($ncolstart + 1; 1) ),
+( "Second machine" | th($ncolstart + 1; 1) ),
+( "Image / osinfo" | th(1; [ $columns | .. | select(.depth? == $maxdepth) ] | length ) ),
 "    </tr>",
+
+(
+range($maxdepth + 1) as $r
+|
 "    <tr>",
-( $dist | keys | sort | .[] | th(1; $dist[.] | length) ),
-"    </tr>",
-"    <tr>",
-( $dist | keys | sort | .[] | $dist[.][] | th(1; 1) ),
-"    </tr>",
+( $columns | .. | select(.depth? == $r) | . as $e | .key | th(1; [ $e | .. | select(.depth? == $maxdepth) ] | length) ),
+"    </tr>"
+),
 
 "  </thead>",
 "  <tbody>",
 
-( $data | to_entries | sort_by(.key) | .[]
-	| .key as $k
-	| .value | to_entries | sort_by(.key)
-	| . as $v
-	| ( "    <tr>",
-		( $k | th( $v | length; 1) ),
-			( $v | .[0].key as $first_key | .[] | .value as $v
-				| ( if .key != $first_key then "    <tr>" else empty end ),
-				( .key | th(1; 1),
-					( $dist | to_entries | .[] | .key as $k | .value[]
-						| [ $k, . ] as $p | $v | getpath($p) | td(1))
-				),
-				"    </tr>"
-			)
-		)
-	),
+(
+$data
+| [ paths(objects) | select(length < $ncolstart * 2) ]
+| foreach .[] as $p([null, [0]];
+	. = [.[1], $p];
+	( .[1] as $p | $data | getpath($p) ) as $v
+	|
+	if (.[0] | length) >= (.[1] | length) then "    <tr>" else empty end,
+	( $v | .key | th([ $v | .value | .. | arrays | .[] | select(.depth? == $ncolstart - 1)] | length; 1)),
+	if (.[1] | length) == $ncolstart * 2 - 1 then
+		( $columns | paths(.depth? == $maxdepth) as $p
+			| [ range(1; 2 * $maxdepth + 2; 2) | $p[0: .] + ["key"] ] as $p
+			| [ $columns | getpath($p[]) ] as $p
+			| $v
+			| getpath(["value"] + $p) | td(1)),
+		"    </tr>"
+	else empty end
+	)
+)
+,
 
 "  </tbody>",
 "</table>"
