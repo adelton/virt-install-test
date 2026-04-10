@@ -173,4 +173,4 @@ jobs:
           vm-name: vm1.example.com
           # no Secure Boot even with the default --boot=uefi
           # because of the --osinfo=generic default
-          condition: secure-boot=no,enrolled-keys=no
+          condition: secure-boot=no

@@ -4,25 +4,38 @@
 <xsl:output method="text"/>
 
 <xsl:template match="/domain">
-  <xsl:apply-templates select="os/firmware/feature[@name = 'secure-boot']"/>
-  <xsl:if test="not(os/firmware/feature[@name = 'secure-boot'])">
-    <xsl:text>secure-boot=missing</xsl:text>
-  </xsl:if>
-  <xsl:text>,</xsl:text>
-  <xsl:apply-templates select="os/firmware/feature[@name = 'enrolled-keys']"/>
-  <xsl:if test="not(os/firmware/feature[@name = 'enrolled-keys'])">
-    <xsl:text>enrolled-keys=missing</xsl:text>
+  <xsl:variable name="secure-boot">
+    <xsl:call-template name="feature">
+      <xsl:with-param name="feature">secure-boot</xsl:with-param>
+    </xsl:call-template>
+  </xsl:variable>
+  <xsl:variable name="enrolled-keys">
+    <xsl:call-template name="feature">
+      <xsl:with-param name="feature">enrolled-keys</xsl:with-param>
+    </xsl:call-template>
+  </xsl:variable>
+  <xsl:text>secure-boot=</xsl:text>
+  <xsl:value-of select="$secure-boot"/>
+  <xsl:if test="$secure-boot != $enrolled-keys">
+    <xsl:text>,enrolled-keys=</xsl:text>
+    <xsl:value-of select="$enrolled-keys"/>
   </xsl:if>
   <xsl:text>&#10;</xsl:text>
 </xsl:template>
 
-<xsl:template match="feature">
-  <xsl:value-of select="@name"/>
-  <xsl:text>=</xsl:text>
-  <xsl:value-of select="@enabled"/>
-  <xsl:if test="not(@enabled)">
-    <xsl:text>unset</xsl:text>
-  </xsl:if>
+<xsl:template name="feature">
+  <xsl:param name="feature"/>
+  <xsl:choose>
+    <xsl:when test="not(os/firmware/feature[@name = $feature])">
+      <xsl:text>missing</xsl:text>
+    </xsl:when>
+    <xsl:when test="not(os/firmware/feature[@name = $feature and @enabled])">
+      <xsl:text>unset</xsl:text>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="os/firmware/feature[@name = $feature]/@enabled"/>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 </xsl:stylesheet>

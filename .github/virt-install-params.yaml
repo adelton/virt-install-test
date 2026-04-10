@@ -39,7 +39,7 @@ virt-install:
       osinfo: alpinelinux3.21
       inventory: tests/inventory/alpine-linux-3.23
       boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
-      secure-boot-check: secure-boot=no,enrolled-keys=no
+      secure-boot-check: secure-boot=no
       virt-customize: >
         --run-command 'sed -i "s/^root:!\\*:/root:*:/" /etc/shadow'
 
@@ -47,13 +47,13 @@ virt-install:
 
   boot:
     uefi:
-      secure-boot-check: secure-boot=yes,enrolled-keys=yes
+      secure-boot-check: secure-boot=yes
     hd:
-      secure-boot-check: secure-boot=missing,enrolled-keys=missing
+      secure-boot-check: secure-boot=missing
     uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-      secure-boot-check: secure-boot=yes,enrolled-keys=yes
+      secure-boot-check: secure-boot=yes
     uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-      secure-boot-check: secure-boot=no,enrolled-keys=no
+      secure-boot-check: secure-boot=no
 
   second-machine:
     - recreate
@@ -62,7 +62,7 @@ virt-install:
 
   exclude:
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
-      secure-boot-check: secure-boot=yes,enrolled-keys=yes
+      secure-boot-check: secure-boot=yes
     - disk-url: https://cloud.debian.org/images/cloud/trixie/20260316-2418/debian-13-genericcloud-amd64-20260316-2418.qcow2
       boot: hd
 
