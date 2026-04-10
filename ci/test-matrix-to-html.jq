@@ -42,7 +42,7 @@ def linebreaks:
 | walk(if type == "object" then to_entries | sort_by(.key) else . end)
 | . as $columns
 # add the .depth for columns
-| reduce (paths(type == "object")) as $p ($columns; setpath($p + [ "depth" ]; ($p | length - 1) / 2)) as $columns
+| ( reduce (paths(type == "object")) as $p ($columns; setpath($p + [ "depth" ]; ($p | length - 1) / 2)) ) as $columns
 # and store the maximal depth
 | ( [ $columns | .. | .depth? ] | max) as $maxdepth
 
