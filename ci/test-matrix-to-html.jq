@@ -15,13 +15,19 @@ def td($rowspan):
 		+ "</td>"
 ;
 
+def linebreaks:
+	gsub(","; ",\u200b")
+	| gsub("(?<c>[.=])"; "\u200b\(.c)")
+;
+
 flatten
 | . as $data
 | reduce .[] as $r ({}; .[ $r.name ][ $r.osinfo ] = 1)
 | with_entries( .value = ( .value | keys | sort ) )
 | . as $dist
 | $data
-| reduce .[] as $r ({}; .[ $r.boot + " / " + ($r["secure-boot-check"] // "(not checked)") ][ $r.["second-machine"] // "(none)" ][ $r.name ][ $r.osinfo ]  = "🔷")
+| reduce .[] as $r ({}; .[ $r.boot + " / " + ($r["secure-boot-check"] // "(not checked)") | linebreaks ]
+	[ $r.["second-machine"] // "(none)" ][ $r.name ][ $r.osinfo ]  = "🔷")
 | . as $data
 |
 
