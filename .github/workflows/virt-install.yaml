@@ -37,9 +37,9 @@ jobs:
           if [ -n "$INPUT_DISK_URL" ] ; then
               cat <<EOS | yq . -o json -
                 virt-install:
-                  disk-url:
-                    $INPUT_DISK_URL :
-                      name: ${INPUT_DISK_URL##*/}
+                  name:
+                    ${INPUT_DISK_URL##*/}:
+                      disk-url: $INPUT_DISK_URL
                       osinfo: $INPUT_OSINFO
                       boot: $INPUT_BOOT
                       virt-customize: $INPUT_VIRT_CUSTOMIZE
