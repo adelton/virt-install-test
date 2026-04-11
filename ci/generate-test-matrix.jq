@@ -49,13 +49,10 @@ def random_select($count; $at_least_once):
 
 | map(select(. as $in | any(($virtinstall.exclude // [])[] as $e | $in | xcontains($e)) | not))
 
-| (reduce ( .[] | to_entries[] ) as $i ({};
-	if has($i.key) | not
-	then .[ $i.key ] = [ $i.value ]
-	elif .[ $i.key ] | index($i.value) == null
-	then (.[ $i.key ] | (now * 1000000 % (length + 1))) as $random_at
+| (reduce ( [ .[] | to_entries[] ] | unique[] ) as $i ({};
+	(.[ $i.key ] | (now * 1000000 % (length + 1))) as $random_at
 		| .[ $i.key ] = .[ $i.key ][0:$random_at] + [ $i.value ] + .[ $i.key ][$random_at:]
-	end)) as $at_least_once
+	)) as $at_least_once
 
 | random_select($virtinstall.count // ([ $data[] | select(arrays), select(objects) | length ] | max * 2); $at_least_once)
 
