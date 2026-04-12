@@ -10,6 +10,15 @@ virt-install:
         aarch64:
           disk-url: https://repo.almalinux.org/almalinux/10.1/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.1-20251125.0.aarch64.qcow2
           inventory: tests/inventory/almalinux-10-aarch64
+          boot: &boot-hd-also-secure-boot
+            uefi:
+              secure-boot-check: secure-boot=yes
+            hd:
+              secure-boot-check: secure-boot=yes
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+              secure-boot-check: secure-boot=yes
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+              secure-boot-check: secure-boot=no
     Fedora 43 (no cloud-init):
       osinfo: fedora42
       arch:
@@ -60,6 +69,8 @@ virt-install:
         aarch64:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-arm64.img
           inventory: tests/inventory/ubuntu-24.04-arm64
+          boot:
+            <<: *boot-hd-also-secure-boot
     Debian 13:
       osinfo: debian13
       arch:
