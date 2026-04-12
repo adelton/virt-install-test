@@ -9,4 +9,15 @@ expect "Connected to domain" { send \r }
 
 set timeout 300
 expect_after timeout { puts "Waiting for login prompt timed out." ; exit 1 }
-expect "login:" { send \x04; puts \n; }
+expect {
+	"BdsDxe: No bootable option or device was found." {
+		# Output any BdsDxe message right after this error
+		expect {
+			-re "BdsDxe:.*$" { exp_continue }
+			timeout { puts "UEFI did not find operating system to boot." ; exit 3 }
+			-timeout 10 -re "\n........"
+		}
+		exp_continue
+	}
+	"login:" { send \x04; puts \n; }
+}
