@@ -1,10 +1,12 @@
 #!/usr/bin/expect
 set DOMAIN [lindex $argv 0]
 
-set timeout 300
-
 spawn -noecho virsh -e "^D" console "$DOMAIN"
-expect {
-	"Connected to domain" { send \r ; exp_continue; }
-	"login:" { send \x04; puts \n; }
-}
+
+set timeout 10
+expect_after timeout { puts "Waiting for connection to domain timed out." ; exit 2 }
+expect "Connected to domain" { send \r }
+
+set timeout 300
+expect_after timeout { puts "Waiting for login prompt timed out." ; exit 1 }
+expect "login:" { send \x04; puts \n; }
