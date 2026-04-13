@@ -28,6 +28,9 @@ virt-install:
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Server/aarch64/images/Fedora-Server-Guest-Generic-43-1.6.aarch64.qcow2
           inventory: tests/inventory/fedora-43-server-aarch64
+          boot: &boot-no-secure-boot
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+              secure-boot-check: secure-boot=no
       virt-customize: >
         --ssh-inject root:file:/home/runner/.ssh/id_rsa.pub
         --firstboot-command 'restorecon -rvv /root/.ssh'
@@ -42,6 +45,8 @@ virt-install:
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
           inventory: tests/inventory/fedora-43-aarch64
+          boot:
+            <<: *boot-no-secure-boot
     Fedora 42:
       osinfo:
         fedora42:
@@ -60,6 +65,8 @@ virt-install:
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2
           inventory: tests/inventory/fedora-42-aarch64
+          boot:
+            <<: *boot-no-secure-boot
     Ubuntu 24.04:
       osinfo: ubuntu24.04
       arch:
