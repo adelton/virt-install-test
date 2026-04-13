@@ -30,6 +30,10 @@ jobs:
 
 This action has been tested on GitHub hosted runners
 `ubuntu-24.04` (`ubuntu-latest`) and `ubuntu-24.04-arm`.
+Note that the `ubuntu-24.04-arm` hosted runners do not enable
+nested virtualization so the virtual machines will run
+emulated and thus slower than the x86_64/amd64 VMs
+on the `ubuntu-24.04` runners.
 
 Before running `virt-install`, this action
 - installs the needed packages;
