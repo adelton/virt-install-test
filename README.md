@@ -21,7 +21,7 @@ jobs:
       - run: ssh root@vm1.example.com cat /etc/os-release
 ```
 
-This action was tested on the `ubuntu-22.04` (`ubuntu-latest`) runners.
+This action was tested on the `ubuntu-24.04` (`ubuntu-latest`) runners.
 
 Before running `virt-install`, this action
 - installs the needed packages;
