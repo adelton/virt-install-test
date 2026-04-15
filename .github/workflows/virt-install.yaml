@@ -8,12 +8,20 @@ on:
       disk-url:
         description: URL of disk to use
       arch:
-        description: Runner architecture
+        description: Non-native architecture (virt-install --arch argument value)
         type: choice
         options:
+          - (guess)
           - x86_64
           - aarch64
-        default: x86_64
+        default: (guess)
+      runs-on:
+        description: Runner
+        type: choice
+        options:
+          - ubuntu-24.04
+          - ubuntu-24.04-arm
+        default: ubuntu-24.04
       vm-name:
         description: Name of the VM (libvirt domain)
         default: vm1.example.com
@@ -48,6 +56,7 @@ jobs:
                     ${INPUT_DISK_URL##*/}:
                       disk-url: $INPUT_DISK_URL
                       arch: $INPUT_ARCH
+                      runs-on: $INPUT_RUNS_ON
                       osinfo: $INPUT_OSINFO
                       boot: $INPUT_BOOT
                       virt-customize: $INPUT_VIRT_CUSTOMIZE
@@ -72,13 +81,14 @@ jobs:
         shell: bash -euxo pipefail {0}
         env:
           INPUT_DISK_URL: ${{ inputs.disk-url }}
-          INPUT_ARCH: ${{ inputs.arch }}
+          INPUT_ARCH: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
+          INPUT_RUNS_ON: ${{ inputs.runs-on }}
           INPUT_OSINFO: ${{ inputs.osinfo }}
           INPUT_BOOT: ${{ inputs.boot }}
           INPUT_VM_NAME: ${{ inputs.vm-name }}
           INPUT_VIRT_CUSTOMIZE: ${{ inputs.virt-customize }}
   virt-install:
-    runs-on: ubuntu-24.04${{ (matrix.arch == 'aarch64' && '-arm') || (matrix.arch == 'x86_64' && '') }}
+    runs-on: ${{ matrix.runs-on }}
     needs: [ test-plan ]
     strategy:
       fail-fast: false
@@ -89,6 +99,7 @@ jobs:
       - uses: ./
         with:
           disk-url: ${{ matrix.disk-url }}
+          arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
@@ -115,6 +126,7 @@ jobs:
       - uses: ./
         with:
           disk-url: ${{ matrix.disk-url }}
+          arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
@@ -130,6 +142,7 @@ jobs:
       - uses: ./
         with:
           disk-url: file://${{ github.workspace }}/${{ steps.fetch-image.outputs.local-image-file }}
+          arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
@@ -150,6 +163,7 @@ jobs:
         uses: ./
         with:
           disk-url: ${{ matrix.disk-url }}
+          arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
@@ -174,6 +188,12 @@ jobs:
       matrix:
         include:
           - runs-on: ubuntu-24.04
+            disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+            secure-boot-check: secure-boot=no
+          - runs-on: ubuntu-24.04
+            disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
+            secure-boot-check: secure-boot=yes
+          - runs-on: ubuntu-24.04-arm
             disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
             secure-boot-check: secure-boot=no
           - runs-on: ubuntu-24.04-arm

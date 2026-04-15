@@ -31,9 +31,11 @@ jobs:
 This action has been tested on GitHub hosted runners
 `ubuntu-24.04` (`ubuntu-latest`) and `ubuntu-24.04-arm`.
 Note that the `ubuntu-24.04-arm` hosted runners do not enable
-nested virtualization so the virtual machines will run
-emulated and thus slower than the x86_64/amd64 VMs
-on the `ubuntu-24.04` runners.
+nested virtualization so even ARM virtual machines will run
+emulated on them and thus slower than the x86_64/amd64 VMs
+on the `ubuntu-24.04` runners. When running non-matching architectures
+(x86_64 on `ubuntu-24.04-arm` or aarch64 on `ubuntu-24.04`, virtual
+machines will of course run emulated as well.
 
 Before running `virt-install`, this action
 - installs the needed packages;
@@ -71,6 +73,27 @@ Example:
       - uses: adelton/virt-install@master
         with:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+```
+
+### arch
+
+Value of the `virt-install` `--arch` option.
+
+Supported values: `x86_64`, `aarch64`.
+
+Default: when the `disk-url` contains strings `x86_64`, `amd64`, `aarch64`,
+or `arm64`, it is set based on the string match. Otherwise unset, using
+CPU native architecture.
+
+Example which explicitly runs aarch64 (arm64) VM on an x86_64 (amd64)
+runner:
+```
+    runs-on: ubuntu-latest
+    steps:
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://www.example.com/pub/Linux-image-1.2.3.qcow2
+          arch: aarch64
 ```
 
 ### vm-name
