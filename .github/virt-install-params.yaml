@@ -123,7 +123,7 @@ virt-install:
       boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
       secure-boot-check: secure-boot=no
       virt-customize: >
-        --run-command 'sed -i "s/^root:!\\*:/root:*:/" /etc/shadow'
+        --edit '/etc/shadow:s/^root:!\*:/root:*:/'
 
   osinfo: linux2024
 
