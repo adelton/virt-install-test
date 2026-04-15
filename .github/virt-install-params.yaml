@@ -29,6 +29,16 @@ virt-install:
         x86_64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Server/x86_64/images/Fedora-Server-Guest-Generic-43-1.6.x86_64.qcow2
           inventory: tests/inventory/fedora-43-server-x86_64
+          runs-on:
+            ubuntu-24.04:
+            ubuntu-24.04-arm:
+              virt-customize: >
+                --ssh-inject root:file:/home/runner/.ssh/id_rsa.pub
+                --firstboot-command 'restorecon -rvv /root/.ssh'
+                --link /dev/null:/etc/systemd/system/initial-setup.service
+                --mkdir /etc/systemd/system.conf.d
+                --copy-in tests/systemd-device-timeout.conf:/etc/systemd/system.conf.d
+                --no-selinux-relabel
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Server/aarch64/images/Fedora-Server-Guest-Generic-43-1.6.aarch64.qcow2
           inventory: tests/inventory/fedora-43-server-aarch64
@@ -53,15 +63,18 @@ virt-install:
         x86_64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
           inventory: tests/inventory/fedora-43-x86_64
+          runs-on:
+            ubuntu-24.04-arm:
+              virt-customize: &systemd-device-timeout >
+                --mkdir /etc/systemd/system.conf.d
+                --copy-in tests/systemd-device-timeout.conf:/etc/systemd/system.conf.d
+                --no-selinux-relabel
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
           inventory: tests/inventory/fedora-43-aarch64
           boot:
             <<: *boot-no-secure-boot
-          virt-customize: &systemd-device-timeout >
-            --mkdir /etc/systemd/system.conf.d
-            --copy-in tests/systemd-device-timeout.conf:/etc/systemd/system.conf.d
-            --no-selinux-relabel
+          virt-customize: *systemd-device-timeout
     Fedora 42:
       osinfo:
         fedora42:
@@ -77,6 +90,9 @@ virt-install:
         x86_64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2
           inventory: tests/inventory/fedora-42-x86_64
+          runs-on:
+            ubuntu-24.04-arm:
+              virt-customize: *systemd-device-timeout
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-42-1.1.aarch64.qcow2
           inventory: tests/inventory/fedora-42-aarch64
