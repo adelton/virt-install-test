@@ -104,6 +104,9 @@ virt-install:
       arch: x86_64
       disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
       inventory: tests/inventory/arch-linux-latest-x86_64
+      virt-customize: >
+        --mkdir /etc/systemd/system/serial-getty@.service.d
+        --copy-in tests/after-sshd.conf:/etc/systemd/system/serial-getty@.service.d
     Alpine Linux 3.23:
       osinfo: alpinelinux3.21
       arch:
