@@ -57,7 +57,7 @@ Name of the VM can be controlled by the `vm-name` input.
 After creating the virtual machine, the action will
 
 - wait for the `login:` prompt on the VM console;
-- determine the IP address that the VM got from DHCP;
+- determine the IP address that the VM got from DHCP or the ARP table;
 - add an entry to `/etc/hosts` for the VM name provided (input `vm-name`);
 - SSH to the VM as root to test the setup;
 - set the `ip-address` output.

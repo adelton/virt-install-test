@@ -153,7 +153,12 @@ jobs:
       - id: fetch-image
         run: |
           curl -LO '${{ matrix.disk-url }}'
-          echo "local-image-file=${DISK_URL##*/}" | tee -a $GITHUB_OUTPUT
+          BASE_NAME="${DISK_URL##*/}"
+          if [[ "$BASE_NAME" =~ .gz$ ]] ; then
+            gunzip < "$BASE_NAME" > "${BASE_NAME%.gz}"
+            BASE_NAME="${BASE_NAME%.gz}"
+          fi
+          echo "local-image-file=$BASE_NAME" | tee -a $GITHUB_OUTPUT
         if: matrix.second-machine == 'local-file'
         env:
           DISK_URL: ${{ matrix.disk-url }}

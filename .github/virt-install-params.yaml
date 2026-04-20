@@ -162,6 +162,23 @@ virt-install:
             <<: *boot-hd-also-secure-boot
       virt-customize: >
         --edit '/boot/grub2/grub.cfg:s/quiet //'
+    OpenWrt 25.12:
+      arch: x86_64
+      disk-url: https://downloads.openwrt.org/releases/25.12.2/targets/x86/64/openwrt-25.12.2-x86-64-generic-ext4-combined-efi.img.gz
+      inventory: tests/inventory/openwrt-25.12-x86_64
+      network: ./tests/network-192-168-1.xml
+      virt-customize: >
+        --mkdir /etc/systemd/system/serial-getty@.service.d
+        --copy-in tests/after-sshd.conf:/etc/systemd/system/serial-getty@.service.d
+        --edit '/etc/rc.local:s%^exit 0%ping -c1 192.168.1.254\necho "Booted, ready for login:" > /dev/console%'
+      boot:
+        hd:
+          secure-boot-check: secure-boot=missing
+        uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+          secure-boot-check: secure-boot=no
+      second-machine:
+        recreate:
+        local-file:
 
   osinfo: linux2024
 

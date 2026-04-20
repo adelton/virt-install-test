@@ -13,7 +13,7 @@ runs:
         cd ${{ inputs.compare-dir }}
         ls *.sh | sort \
         | while read i ; do
-          scp $i root@${{ inputs.vm-name }}:/tmp/test-$i
+          scp -O $i root@${{ inputs.vm-name }}:/tmp/test-$i
           if [ -f ${i%.sh}.out ] ; then
             echo -n '::group::diff of: '
             tail -1 $i
