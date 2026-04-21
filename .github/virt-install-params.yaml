@@ -134,7 +134,7 @@ virt-install:
           disk-url: https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.3-x86_64-uefi-cloudinit-r0.qcow2
           inventory: tests/inventory/alpine-linux-3.23-x86_64
         aarch64:
-          disk-url: https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.3-aarch64-uefi-cloudinit-r0.qcow2
+          disk-url: https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/generic_alpine-3.23.3-aarch64-uefi-tiny-r0.qcow2
           inventory: tests/inventory/alpine-linux-3.23-aarch64
       boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
       secure-boot-check: secure-boot=no
