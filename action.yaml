@@ -85,7 +85,14 @@ runs:
           FILENAME=base/$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
           [ -f virt-install-images/"$FILENAME" ] || curl -LSs -o virt-install-images/"$FILENAME" "$INPUT_DISK_URL"
         fi
-        qemu-img create -f qcow2 -b "$FILENAME" -F qcow2 virt-install-images/"$INPUT_VM_NAME".qcow2
+        (
+        cd virt-install-images
+        FORMAT=raw
+        if file "$FILENAME" | grep 'QEMU QCOW Image' ; then FORMAT=qcow2
+        elif file "$FILENAME" | grep 'VMware4 disk image' ; then FORMAT=vmdk
+        fi
+        qemu-img create -f qcow2 -b "$FILENAME" -F "$FORMAT" "$INPUT_VM_NAME".qcow2
+        )
       env:
         INPUT_DISK_URL: ${{ inputs.disk-url }}
         INPUT_VM_NAME: ${{ inputs.vm-name }}

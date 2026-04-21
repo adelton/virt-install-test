@@ -103,7 +103,7 @@ virt-install:
       osinfo: ubuntu24.04
       arch:
         x86_64:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-amd64.vmdk
           inventory: tests/inventory/ubuntu-24.04-amd64
         aarch64:
           disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-arm64.img
