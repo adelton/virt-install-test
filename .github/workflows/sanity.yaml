@@ -7,6 +7,7 @@ on:
 jobs:
   catch-unsafe-vm-name:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     strategy:
       fail-fast: false
       matrix:

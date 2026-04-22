@@ -10,6 +10,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
       - run: sudo apt update

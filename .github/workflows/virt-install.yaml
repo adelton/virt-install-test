@@ -90,6 +90,7 @@ jobs:
   virt-install:
     runs-on: ${{ matrix.runs-on }}
     needs: [ test-plan ]
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -183,6 +184,7 @@ jobs:
 
   virt-install-defaults:
     runs-on: ${{ matrix.runs-on }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
