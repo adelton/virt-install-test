@@ -140,6 +140,26 @@ virt-install:
       secure-boot-check: secure-boot=no
       virt-customize: >
         --edit '/etc/shadow:s/^root:!\*:/root:*:/'
+    openSUSE Tumbleweed:
+      osinfo: opensusetumbleweed
+      arch:
+        x86_64:
+          disk-url: https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2
+          inventory: tests/inventory/opensuse-tumbleweed
+          boot:
+            uefi:
+              secure-boot-check: secure-boot=yes
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+              secure-boot-check: secure-boot=yes
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+              secure-boot-check: secure-boot=no
+        aarch64:
+          disk-url: https://download.opensuse.org/ports/aarch64/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.aarch64-Cloud.qcow2
+          inventory: tests/inventory/opensuse-tumbleweed
+          boot:
+            <<: *boot-hd-also-secure-boot
+      virt-customize: >
+        --edit '/boot/grub2/grub.cfg:s/quiet //'
 
   osinfo: linux2024
 
