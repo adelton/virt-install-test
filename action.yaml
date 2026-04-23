@@ -15,6 +15,9 @@ inputs:
   boot:
     description: The virt-install --boot argument value
     default: uefi
+  network:
+    description: Space-separated values for virt-install --network arguments
+    default: bridge=virbr0,model=virtio
   virt-customize:
     description: Arguments to virt-customize to be run on the image (optional)
 outputs:
@@ -137,14 +140,47 @@ runs:
         sudo chmod a+rw /var/run/libvirt/libvirt-sock
       shell: bash -euxo pipefail {0}
     - run: |
+        IFS=' ' read -ra network <<< "$INPUT_NETWORK"
+        (
+        echo -n 'network='
+        for n in "${network[@]}" ; do
+          if [[ "$n" =~ ^/ ]] || [[ "$n" =~ ^./ ]] then
+            NET_NAME=$( xmllint --xpath 'string(/network/name)' "$n" )
+            BRIDGE=$( xmllint --xpath 'string(/network/bridge/@name)' "$n" )
+            EXISTS=$( set +o pipefail ;
+              virsh --connect qemu:///system net-dumpxml "$NET_NAME" 2> /dev/null \
+                | xmllint --xpath 'string(/network/bridge/@name)' - 2> /dev/null || true )
+            if [ -z "$EXISTS" ] || [ "$BRIDGE" != "$EXISTS" ] ; then
+              virsh --connect qemu:///system net-create "$n" >&2
+              echo "allow $BRIDGE" | sudo tee -a /etc/qemu/bridge.conf > /dev/null
+            fi
+            echo "bridge=$BRIDGE"
+          else
+            if [[ "$n" =~ /^bridge= ]] ; then
+              BRIDGE=${n#bridge=}
+              BRIDGE=${BRIDGE%%,*}
+              if [ -n "$BRIDGE" ] ; then
+                echo "allow $BRIDGE" | sudo tee -a /etc/qemu/bridge.conf > /dev/null
+              fi
+            fi
+            echo "$n"
+          fi
+        done | xargs echo
+        ) | tee -a "$GITHUB_OUTPUT"
+      env:
+        INPUT_NETWORK: ${{ inputs.network }}
+      shell: bash -euxo pipefail {0}
+      id: network-process
+    - run: |
         # virt-install
         args=()
         [ "$INPUT_OSINFO" = generic ] && args+=( --memory 2000 )
         [ -n "$INPUT_ARCH" ] && args+=( --arch "$INPUT_ARCH" )
+        IFS=' ' read -ra network <<< "$INPUT_NETWORK" ; for n in "${network[@]}"; do args+=( --network "$n" ) ; done
         (
         set -x
         virt-install --graphics none --noautoconsole --noreboot \
-          --name "$INPUT_VM_NAME" --network bridge=virbr0,model=virtio --import \
+          --name "$INPUT_VM_NAME" --import \
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
           --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
           --osinfo "$INPUT_OSINFO" --boot "$INPUT_BOOT" \
@@ -159,6 +195,7 @@ runs:
         INPUT_ARCH: ${{ steps.image-arch.outputs.arch }}
         INPUT_OSINFO: ${{ inputs.osinfo }}
         INPUT_BOOT: ${{ inputs.boot }}
+        INPUT_NETWORK: ${{ steps.network-process.outputs.network }}
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: bash
     - run: |
@@ -169,8 +206,14 @@ runs:
         bash -euo pipefail -c "echo ::group::output of: virsh console ${{ inputs.vm-name }} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
     - run: |
         MAC=$( virsh --connect qemu:///session dumpxml "$INPUT_VM_NAME" | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
-        virsh --connect qemu:///system net-dhcp-leases default --mac $MAC
-        IP=$( virsh --connect qemu:///system net-dhcp-leases default --mac $MAC | awk 'BEGIN { MAC=ARGV[1] ; delete ARGV[1] } $0 ~ MAC { gsub("/.*$", "", $5); print $5 }' $MAC )
+        IP=
+        while read n ; do
+          if [ -n "$n" ] ; then
+            virsh --connect qemu:///system net-dhcp-leases "$n" --mac $MAC
+            IP=$( virsh --connect qemu:///system net-dhcp-leases "$n" --mac $MAC | awk 'BEGIN { MAC=ARGV[1] ; delete ARGV[1] } $0 ~ MAC { gsub("/.*$", "", $5); print $5 }' $MAC )
+            if [ -n "$IP" ] ; then break ; fi
+          fi
+        done < <( virsh --connect qemu:///system net-list --name )
         if [ -n "$IP" ] ; then
           echo "$IP $INPUT_VM_NAME" | sudo tee -a /etc/hosts
           echo "ip-address=$IP" | tee -a "$GITHUB_OUTPUT"

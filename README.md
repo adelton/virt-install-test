@@ -47,7 +47,9 @@ Before running `virt-install`, this action
   to set up [SSH authorized_keys and enable SSH access to
   root](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#ssh);
 - enables access to the `virbr0` bridge to use system libvirtd's
-  networking and DHCP.
+  networking and DHCP;
+- or if a network XML file is provided, create the network
+  using `virsh net-create` and enable access to its bridge.
 
 Then `virt-install` is run, creating the VM in `qemu:///session`.
 Name of the VM can be controlled by the `vm-name` input.
@@ -159,6 +161,37 @@ lists supported values. The noteworthy ones are
 
 * `hd` to boot from BIOS;
 * `uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no` to disable Secure Boot.
+
+### network
+
+Space-separated values for `virt-install` `--network` arguments.
+
+Example of using a bridge that presumably previous step in the job
+created:
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          network: bridge=custom1
+```
+
+Default: `bridge=virbr0,model=virtio`
+
+Besides values directly passed to `virt-install`, this action also
+supports specifying network XML file either as an absolute path, or
+relative path starting with `./`. This file is then passed to
+`virsh net-create` to create the network, and enable access to its
+bridge.
+
+For example:
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          network: ./custom-network.xml
+```
+
+The network XML format is documented at https://libvirt.org/formatnetwork.html.
 
 ### virt-customize
 

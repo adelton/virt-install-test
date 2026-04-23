@@ -31,6 +31,9 @@ on:
       boot:
         description: The virt-install --boot argument value
         default: uefi
+      network:
+        description: Space-separated values for virt-install --network arguments
+        default: bridge=virbr0,model=virtio
       virt-customize:
         description: Arguments to virt-customize to be run on the image
       command:
@@ -59,6 +62,7 @@ jobs:
                       runs-on: $INPUT_RUNS_ON
                       osinfo: $INPUT_OSINFO
                       boot: $INPUT_BOOT
+                      network: $INPUT_NETWORK
                       virt-customize: $INPUT_VIRT_CUSTOMIZE
           EOS
           else
@@ -85,6 +89,7 @@ jobs:
           INPUT_RUNS_ON: ${{ inputs.runs-on }}
           INPUT_OSINFO: ${{ inputs.osinfo }}
           INPUT_BOOT: ${{ inputs.boot }}
+          INPUT_NETWORK: ${{ inputs.network }}
           INPUT_VM_NAME: ${{ inputs.vm-name }}
           INPUT_VIRT_CUSTOMIZE: ${{ inputs.virt-customize }}
   virt-install:
@@ -105,6 +110,7 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
+          network: ${{ matrix.network }}
           virt-customize: ${{ matrix.virt-customize }}
       - uses: ./.github/actions/inventory
         with:
@@ -120,8 +126,13 @@ jobs:
         env:
           INPUT_COMMAND: ${{ inputs.command }}
       - run: |
-          [[ "$IP_ADDRESS" =~ ^192\.168\.122\. ]]
+          if [ "$INPUT_NETWORK" = './tests/network-192-168-1.xml' ] ; then
+            [[ "$IP_ADDRESS" =~ ^192\.168\.1\. ]]
+          else
+            [[ "$IP_ADDRESS" =~ ^192\.168\.122\. ]]
+          fi
         env:
+          INPUT_NETWORK: ${{ matrix.network }}
           IP_ADDRESS: ${{ steps.run-machine.outputs.ip-address }}
 
       - run: |
@@ -136,6 +147,7 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
+          network: ${{ matrix.network }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'recreate'
       - id: fetch-image
@@ -152,6 +164,7 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
+          network: ${{ matrix.network }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'local-file'
       - uses: ./.github/actions/inventory
@@ -173,6 +186,7 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
+          network: ${{ matrix.network }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'multihost'
       - run: |
