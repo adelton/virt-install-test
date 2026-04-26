@@ -107,11 +107,16 @@ virt-install:
         x86_64:
           disk-url: https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64v3.vmdk
           inventory: tests/inventory/ubuntu-26.04-amd64
+          runs-on:
+            ubuntu-24.04:
+            ubuntu-24.04-arm:
+              virt-customize: *systemd-device-timeout
         aarch64:
           disk-url: https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-arm64.img
           inventory: tests/inventory/ubuntu-26.04-arm64
           boot:
             <<: *boot-hd-also-secure-boot
+          virt-customize: *systemd-device-timeout
     Debian 13:
       osinfo: debian13
       arch:
