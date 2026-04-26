@@ -49,9 +49,9 @@ runs:
     - run: |
         if [ -n "$INPUT_ARCH" ] ; then
             echo "arch=$INPUT_ARCH"
-        elif [ "$UNAME" != aarch64 ] && [[ "$INPUT_DISK_URL" =~ [-/.](aarch64|arm64)[-/.] ]] ; then
+        elif [ "$UNAME" != aarch64 ] && [[ "$INPUT_DISK_URL" =~ [-/.](aarch64|arm64)|(aarch64|arm64)[-/.] ]] ; then
             echo 'arch=aarch64'
-        elif [ "$UNAME" != x86_64 ] && [[ "$INPUT_DISK_URL" =~ [-/.](x86_64|amd64)[-/.] ]] ; then
+        elif [ "$UNAME" != x86_64 ] && [[ "$INPUT_DISK_URL" =~ [-/.](x86_64|amd64)|(x86_64|amd64)[-/.] ]] ; then
             echo 'arch=x86_64'
         fi | tee -a $GITHUB_OUTPUT
       shell: bash
