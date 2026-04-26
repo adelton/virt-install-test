@@ -214,7 +214,7 @@ runs:
         while read n ; do
           if [ -n "$n" ] ; then
             virsh --connect qemu:///system net-dhcp-leases "$n" --mac $MAC
-            IP=$( virsh --connect qemu:///system net-dhcp-leases "$n" --mac $MAC | awk 'BEGIN { MAC=ARGV[1] ; delete ARGV[1] } $0 ~ MAC { gsub("/.*$", "", $5); print $5 }' $MAC )
+            IP=$( virsh --connect qemu:///system net-dhcp-leases "$n" --mac $MAC | sort -r | awk 'BEGIN { MAC=ARGV[1] ; delete ARGV[1] } $0 ~ MAC { gsub("/.*$", "", $5); print $5 ; exit}' $MAC )
             if [ -n "$IP" ] ; then break ; fi
           fi
         done < <( virsh --connect qemu:///system net-list --name )
