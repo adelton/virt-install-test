@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64v3.img
           vm-name: ${{ matrix.vm-name }}
         id: virt-install
         continue-on-error: true

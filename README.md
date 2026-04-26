@@ -74,7 +74,7 @@ Example:
 ```
       - uses: adelton/virt-install@master
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64.img
 ```
 
 ### arch
@@ -106,7 +106,7 @@ so after
 ```
       - uses: adelton/virt-install@master
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64.img
           vm-name: ubuntu.example.test
 ```
 steps like
@@ -238,7 +238,7 @@ Example:
 ```
       - uses: adelton/virt-install@master
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64.img
           osinfo: ubuntu24.04
         id: run-server
       - run: echo 'We will set our client VMs to talk to ${{ steps.run-server.outputs.ip-address }}'

@@ -101,15 +101,15 @@ virt-install:
           boot:
             <<: *boot-no-secure-boot
           virt-customize: *systemd-device-timeout
-    Ubuntu 24.04:
+    Ubuntu 26.04:
       osinfo: ubuntu24.04
       arch:
         x86_64:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-amd64.vmdk
-          inventory: tests/inventory/ubuntu-24.04-amd64
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64v3.vmdk
+          inventory: tests/inventory/ubuntu-26.04-amd64
         aarch64:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release-20260321/ubuntu-24.04-server-cloudimg-arm64.img
-          inventory: tests/inventory/ubuntu-24.04-arm64
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-arm64.img
+          inventory: tests/inventory/ubuntu-26.04-arm64
           boot:
             <<: *boot-hd-also-secure-boot
     Debian 13:
