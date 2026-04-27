@@ -34,7 +34,7 @@ Note that the `ubuntu-24.04-arm` hosted runners do not enable
 nested virtualization so even ARM virtual machines will run
 emulated on them and thus slower than the x86_64/amd64 VMs
 on the `ubuntu-24.04` runners. When running non-matching architectures
-(x86_64 on `ubuntu-24.04-arm` or aarch64 on `ubuntu-24.04`, virtual
+(x86_64 on `ubuntu-24.04-arm` or aarch64 on `ubuntu-24.04`), virtual
 machines will of course run emulated as well.
 
 Before running `virt-install`, this action
