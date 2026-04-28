@@ -86,17 +86,22 @@ runs:
         mkdir -p virt-install-images/base
         (
         cd virt-install-images
+        FILE_FILE=
         if [ -z "$FILENAME" ] ; then
           FILENAME=base/$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
           [ -f "$FILENAME" ] || curl -LSs -o "$FILENAME" "$INPUT_DISK_URL"
-          if file "$FILENAME" | grep 'gzip compressed data' ; then
+          FILE_FILE=$( file "$FILENAME" )
+          if [[ "$FILE_FILE" =~ gzip[[:space:]]compressed[[:space:]]data ]] ; then
             gunzip < "$FILENAME" > "$FILENAME".unpacked
             FILENAME="$FILENAME".unpacked
+            FILE_FILE=$( file "$FILENAME" )
           fi
+        else
+          FILE_FILE=$( file "$FILENAME" )
         fi
         FORMAT=raw
-        if file "$FILENAME" | grep 'QEMU QCOW Image' ; then FORMAT=qcow2
-        elif file "$FILENAME" | grep 'VMware4 disk image' ; then FORMAT=vmdk
+        if [[ "$FILE_FILE" =~ QEMU[[:space:]]QCOW[[:space:]]Image ]] ; then FORMAT=qcow2
+        elif [[ "$FILE_FILE" =~ VMware4[[:space:]]disk[[:space:]]image ]] ; then FORMAT=vmdk
         fi
         qemu-img create -f qcow2 -b "$FILENAME" -F "$FORMAT" "$INPUT_VM_NAME".qcow2
         )
