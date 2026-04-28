@@ -89,15 +89,19 @@ runs:
         FILE_FILE=
         if [ -z "$FILENAME" ] ; then
           FILENAME=base/$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
-          [ -f "$FILENAME" ] || curl -LSs -o "$FILENAME" "$INPUT_DISK_URL"
-          FILE_FILE=$( file "$FILENAME" )
+          if ! [ -f "$FILENAME" ] ; then
+            curl -LSs -o "$FILENAME" "$INPUT_DISK_URL"
+            ls -l "$FILENAME"
+            sha256sum "$FILENAME"
+          fi
+          FILE_FILE=$( file "$FILENAME" | tee /dev/stderr )
           if [[ "$FILE_FILE" =~ gzip[[:space:]]compressed[[:space:]]data ]] ; then
             gunzip < "$FILENAME" > "$FILENAME".unpacked
             FILENAME="$FILENAME".unpacked
-            FILE_FILE=$( file "$FILENAME" )
+            FILE_FILE=$( file "$FILENAME" | tee /dev/stderr )
           fi
         else
-          FILE_FILE=$( file "$FILENAME" )
+          FILE_FILE=$( file "$FILENAME" | tee /dev/stderr )
         fi
         FORMAT=raw
         if [[ "$FILE_FILE" =~ QEMU[[:space:]]QCOW[[:space:]]Image ]] ; then FORMAT=qcow2
