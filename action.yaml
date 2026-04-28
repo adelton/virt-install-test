@@ -90,7 +90,7 @@ runs:
         if [ -z "$FILENAME" ] ; then
           FILENAME=base/$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
           if ! [ -f "$FILENAME" ] ; then
-            curl -LSs -o "$FILENAME" "$INPUT_DISK_URL"
+            curl -LSs --fail-with-body -o "$FILENAME" "$INPUT_DISK_URL"
             ls -l "$FILENAME"
             sha256sum "$FILENAME"
           fi
