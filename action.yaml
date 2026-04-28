@@ -73,7 +73,6 @@ runs:
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
       if: inputs.virt-customize != ''
     - run: |
-        mkdir -p virt-install-images/base
         FILENAME=
         if [[ "$INPUT_DISK_URL" =~ ^file: ]] ; then
           if [[ "$INPUT_DISK_URL" =~ ^file:/// ]] ; then
@@ -84,16 +83,17 @@ runs:
             FILENAME="${INPUT_DISK_URL#file:}"
           fi
         fi
+        mkdir -p virt-install-images/base
+        (
+        cd virt-install-images
         if [ -z "$FILENAME" ] ; then
           FILENAME=base/$( echo -n "$INPUT_DISK_URL" | sha256sum | sed 's/ .*//' )"-${INPUT_DISK_URL##*/}"
-          [ -f virt-install-images/"$FILENAME" ] || curl -LSs -o virt-install-images/"$FILENAME" "$INPUT_DISK_URL"
-          if file virt-install-images/"$FILENAME" | grep 'gzip compressed data' ; then
-            gunzip < virt-install-images/"$FILENAME" > virt-install-images/"$FILENAME".unpacked
+          [ -f "$FILENAME" ] || curl -LSs -o "$FILENAME" "$INPUT_DISK_URL"
+          if file "$FILENAME" | grep 'gzip compressed data' ; then
+            gunzip < "$FILENAME" > "$FILENAME".unpacked
             FILENAME="$FILENAME".unpacked
           fi
         fi
-        (
-        cd virt-install-images
         FORMAT=raw
         if file "$FILENAME" | grep 'QEMU QCOW Image' ; then FORMAT=qcow2
         elif file "$FILENAME" | grep 'VMware4 disk image' ; then FORMAT=vmdk
