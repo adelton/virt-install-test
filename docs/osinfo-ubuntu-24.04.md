@@ -14,7 +14,6 @@ for extended period of time are shown.
     - `alpinelinux3.21`: [Alpine Linux 3.21](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/alpinelinux.org/alpinelinux-3.21.xml.in)
     - `alpinelinux3.20`: [Alpine Linux 3.20](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/alpinelinux.org/alpinelinux-3.20.xml.in)
     - `alpinelinux3.19`: [Alpine Linux 3.19](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/alpinelinux.org/alpinelinux-3.19.xml.in)
-    - `alpinelinux3.18`: [Alpine Linux 3.18](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/alpinelinux.org/alpinelinux-3.18.xml.in)
 - alt
     - `alt10.3`: [ALT 10.3](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/altlinux.org/alt-10.3.xml.in)
     - `alt10.2`: [ALT 10.2](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/altlinux.org/alt-10.2.xml.in)
@@ -225,7 +224,6 @@ for extended period of time are shown.
     - `omnios`: [OmniOSCE Bloody](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/omnios.org/bloody-rolling.xml.in)
 - openbsd
     - `openbsd7.6`: [OpenBSD 7.6](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/openbsd.org/openbsd-7.6.xml.in)
-    - `openbsd7.5`: [OpenBSD 7.5](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/openbsd.org/openbsd-7.5.xml.in)
 - openindiana
     - `openindiana`: [OpenIndiana Hipster](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/openindiana.org/hipster-rolling.xml.in)
 - opensuse
