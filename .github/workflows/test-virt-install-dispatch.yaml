@@ -4,6 +4,8 @@ on:
     branches:
       - '*'
   workflow_dispatch:
+  schedule:
+    - cron: '10 3 * * 1'
 
 jobs:
   test-dispatch:
@@ -12,6 +14,7 @@ jobs:
     permissions:
       actions: write
     timeout-minutes: 1
+    if: github.event_name != 'schedule' || github.repository == 'adelton/virt-install'
     steps:
       - run: |
           curl -sS --fail-with-body -X POST \
