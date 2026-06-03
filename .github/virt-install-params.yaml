@@ -38,6 +38,7 @@ virt-install:
         --firstboot-command 'restorecon -rvv /root/.ssh'
         --link /dev/null:/etc/systemd/system/initial-setup.service
         --no-selinux-relabel
+      vsock-ssh-test: no
     Fedora 44:
       osinfo: fedora42
       arch:
@@ -84,6 +85,7 @@ virt-install:
           boot:
             <<: *boot-no-secure-boot
           virt-customize: *systemd-device-timeout
+      vsock-ssh-test: no
     Ubuntu 26.04:
       osinfo: ubuntu24.04
       arch:
@@ -140,6 +142,7 @@ virt-install:
               secure-boot-check: secure-boot=yes
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
               secure-boot-check: secure-boot=no
+      vsock-ssh-test: no
     Arch Linux latest:
       osinfo: archlinux
       arch: x86_64
@@ -161,6 +164,7 @@ virt-install:
         <<: *boot-no-secure-boot
       virt-customize: >
         --edit '/etc/shadow:s/^root:!\*:/root:*:/'
+      vsock-ssh-test: no
     openSUSE Tumbleweed:
       osinfo: opensusetumbleweed
       arch:
@@ -181,6 +185,7 @@ virt-install:
             <<: *boot-hd-also-secure-boot
       virt-customize: >
         --edit '/boot/grub2/grub.cfg:s/quiet //'
+      vsock-ssh-test: no
     OpenWrt 25.12:
       arch: x86_64
       disk-url: https://downloads.openwrt.org/releases/25.12.2/targets/x86/64/openwrt-25.12.2-x86-64-generic-ext4-combined-efi.img.gz
@@ -200,6 +205,8 @@ virt-install:
       second-machine:
         recreate:
         local-file:
+      virtiofs-test: no
+      vsock-ssh-test: no
 
   osinfo: linux2024
 
@@ -223,6 +230,14 @@ virt-install:
     - recreate
     - local-file
     - multihost
+
+  args:
+    - >
+      --memorybacking access.mode=shared
+      --filesystem source=/etc,target=host-dir,driver.type=virtiofs
+      --vsock cid.auto=yes
+  virtiofs-test: test
+  vsock-ssh-test: test
 
   exclude:
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2

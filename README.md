@@ -197,6 +197,35 @@ For example:
 
 The network XML format is documented at https://libvirt.org/formatnetwork.html.
 
+### args
+
+Additional command-line arguments to `virt-install`.
+
+Example of enabling a vsock host/guest interface for the VM:
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          args: --vsock cid.auto=yes
+```
+
+Example of exporting a directory to the VM:
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          args: >
+            --memorybacking access.mode=shared
+            --filesystem source=/etc,target=host-dir,driver.type=virtiofs
+```
+
+Note that while all of the inputs above that get turned to `virt-install`
+arguments (`arch`, `osinfo`, `network`, ...) could be specified via an
+appropriate value of this `args` option, having them as separate inputs
+allows the action to do additional preparation or compatibility work,
+like installing extra packages for emulated virtualization or creating
+the network from the network XML file.
+
 ### virt-customize
 
 Command-line argument to `virt-customize` to be run on the image

@@ -35,6 +35,8 @@ on:
       network:
         description: Space-separated values for virt-install --network arguments
         default: bridge=virbr0,model=virtio
+      args:
+        description: Generic virt-install arguments
       virt-customize:
         description: Arguments to virt-customize to be run on the image
       command:
@@ -68,6 +70,7 @@ jobs:
                       osinfo: $INPUT_OSINFO
                       boot: "$INPUT_BOOT"
                       network: $INPUT_NETWORK
+                      args: $INPUT_ARGS
                       virt-customize: $INPUT_VIRT_CUSTOMIZE
           EOS
           else
@@ -95,6 +98,7 @@ jobs:
           INPUT_OSINFO: ${{ inputs.osinfo }}
           INPUT_BOOT: ${{ inputs.boot }}
           INPUT_NETWORK: ${{ inputs.network }}
+          INPUT_ARGS: ${{ inputs.args }}
           INPUT_VM_NAME: ${{ inputs.vm-name }}
           INPUT_VIRT_CUSTOMIZE: ${{ inputs.virt-customize }}
   virt-install:
@@ -116,6 +120,7 @@ jobs:
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
           network: ${{ matrix.network }}
+          args: ${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
       - uses: ./.github/actions/inventory
         with:
@@ -139,6 +144,14 @@ jobs:
         env:
           INPUT_NETWORK: ${{ matrix.network }}
           IP_ADDRESS: ${{ steps.run-machine.outputs.ip-address }}
+      - run: |
+          diff <( ssh root@'${{ needs.test-plan.outputs.vm-name }}' 'mkdir /mnt/host-dir && mount -t virtiofs host-dir /mnt/host-dir && cat /mnt/host-dir/hostname' ) /etc/hostname
+        if: matrix.virtiofs-test == 'test'
+      - run: |
+          virsh dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath '/domain/devices/vsock' -
+          VSOCK=$( virsh dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath 'string(/domain/devices/vsock/cid/@address)' - )
+          ssh -o 'StrictHostKeyChecking accept-new' -o "ProxyCommand=socat - VSOCK-CONNECT:$VSOCK:22" root@vsock%$VSOCK cat /etc/hostname
+        if: matrix.vsock-ssh-test == 'test'
 
       - run: |
           virsh destroy '${{ needs.test-plan.outputs.vm-name }}'
@@ -153,6 +166,7 @@ jobs:
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
           network: ${{ matrix.network }}
+          args: ${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'recreate'
       - id: fetch-image
@@ -175,6 +189,7 @@ jobs:
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
           network: ${{ matrix.network }}
+          args: ${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'local-file'
       - uses: ./.github/actions/inventory
@@ -197,6 +212,7 @@ jobs:
           osinfo: ${{ matrix.osinfo }}
           boot: ${{ matrix.boot }}
           network: ${{ matrix.network }}
+          args: ${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'multihost'
       - run: |

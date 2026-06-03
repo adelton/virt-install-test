@@ -18,6 +18,8 @@ inputs:
   network:
     description: Space-separated values for virt-install --network arguments
     default: bridge=virbr0,model=virtio
+  args:
+    description: Generic virt-install arguments
   virt-customize:
     description: Arguments to virt-customize to be run on the image (optional)
 outputs:
@@ -38,7 +40,7 @@ runs:
       shell: |
         bash -euo pipefail -c "echo -n '::group::output of: ' ; head -1 {0} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
     - run: |
-        sudo apt install genisoimage libvirt-daemon-system virtinst expect
+        sudo apt install genisoimage libvirt-daemon-system virtinst expect virtiofsd socat
         # we install libvirt-daemon-system and not just libvirt-daemon
         # to get the libvirtd.service which configures virbr0
       shell: |
@@ -148,6 +150,7 @@ runs:
         systemctl status libvirtd.service || true
         ip a
         [ -c /dev/kvm ] && sudo chmod a+rw /dev/kvm
+        sudo chmod 666 /dev/vhost-vsock
         sudo mkdir /etc/qemu && echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
         sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
         sudo chmod a+rw /var/run/libvirt/libvirt-sock
@@ -191,6 +194,7 @@ runs:
         [ -n "$INPUT_ARCH" ] && [ "$INPUT_ARCH" != '-' ] && args+=( --arch "$INPUT_ARCH" )
         IFS=' ' read -ra network <<< "$INPUT_NETWORK" ; for n in "${network[@]}"; do args+=( --network "$n" ) ; done
         [ -n "$INPUT_BOOT" ] && [ "$INPUT_BOOT" != '-' ] && args+=( --boot "$INPUT_BOOT" )
+        [ -n "$INPUT_ARGS" ] && while read a ; do args+=( "$a" ) ; done < <( printf '%s\n' "$INPUT_ARGS" | xargs printf '%s\n' )
         (
         set -x
         virt-install --graphics none --noautoconsole --noreboot \
@@ -210,6 +214,7 @@ runs:
         INPUT_OSINFO: ${{ inputs.osinfo }}
         INPUT_BOOT: ${{ inputs.boot }}
         INPUT_NETWORK: ${{ steps.network-process.outputs.network }}
+        INPUT_ARGS: ${{ inputs.args }}
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: bash -euxo pipefail {0}
     - run: |
