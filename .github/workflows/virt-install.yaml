@@ -56,6 +56,7 @@ jobs:
       - id: produce-matrix
         run: |
           if [ -n "$INPUT_DISK_URL" ] ; then
+              [ "$INPUT_ARCH" == '(guess)' ] && INPUT_ARCH=
               cat <<EOS | yq . -o json -
                 virt-install:
                   name:
@@ -88,7 +89,7 @@ jobs:
         shell: bash -euxo pipefail {0}
         env:
           INPUT_DISK_URL: ${{ inputs.disk-url }}
-          INPUT_ARCH: ${{ (inputs.arch == '(guess)' && '') || inputs.arch }}
+          INPUT_ARCH: ${{ inputs.arch }}
           INPUT_RUNS_ON: ${{ inputs.runs-on }}
           INPUT_OSINFO: ${{ inputs.osinfo }}
           INPUT_BOOT: ${{ inputs.boot }}
