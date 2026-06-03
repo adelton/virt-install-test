@@ -88,7 +88,7 @@ jobs:
         shell: bash -euxo pipefail {0}
         env:
           INPUT_DISK_URL: ${{ inputs.disk-url }}
-          INPUT_ARCH: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
+          INPUT_ARCH: ${{ (inputs.arch == '(guess)' && '') || inputs.arch }}
           INPUT_RUNS_ON: ${{ inputs.runs-on }}
           INPUT_OSINFO: ${{ inputs.osinfo }}
           INPUT_BOOT: ${{ inputs.boot }}
