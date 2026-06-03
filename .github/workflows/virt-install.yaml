@@ -14,6 +14,7 @@ on:
           - (guess)
           - x86_64
           - aarch64
+          - "-"
         default: (guess)
       runs-on:
         description: Runner
@@ -62,10 +63,10 @@ jobs:
                   name:
                     ${INPUT_DISK_URL##*/}:
                       disk-url: $INPUT_DISK_URL
-                      arch: $INPUT_ARCH
+                      arch: "$INPUT_ARCH"
                       runs-on: $INPUT_RUNS_ON
                       osinfo: $INPUT_OSINFO
-                      boot: $INPUT_BOOT
+                      boot: "$INPUT_BOOT"
                       network: $INPUT_NETWORK
                       virt-customize: $INPUT_VIRT_CUSTOMIZE
           EOS

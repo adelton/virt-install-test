@@ -64,6 +64,8 @@ virt-install:
           boot:
            hd:
              secure-boot-check: secure-boot=missing
+           -:
+             secure-boot-check: secure-boot=missing
            uefi:
              secure-boot-check: secure-boot=no
            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
@@ -104,6 +106,8 @@ virt-install:
               secure-boot-check: secure-boot=yes
             hd:
               secure-boot-check: secure-boot=yes
+            -:
+              secure-boot-check: secure-boot=yes
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
               secure-boot-check: secure-boot=yes
           virt-customize: *systemd-device-timeout
@@ -113,9 +117,29 @@ virt-install:
         x86_64:
           disk-url: https://cloud.debian.org/images/cloud/trixie/20260518-2482/debian-13-genericcloud-amd64-20260518-2482.qcow2
           inventory: tests/inventory/debian-13-amd64
+          boot:
+            uefi:
+              secure-boot-check: secure-boot=yes
+            hd:
+              secure-boot-check: secure-boot=missing
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+              secure-boot-check: secure-boot=yes
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+              secure-boot-check: secure-boot=no
         aarch64:
           disk-url: https://cloud.debian.org/images/cloud/trixie/20260518-2482/debian-13-genericcloud-arm64-20260518-2482.qcow2
           inventory: tests/inventory/debian-13-arm64
+          boot:
+            uefi:
+              secure-boot-check: secure-boot=yes
+            -:
+              secure-boot-check: secure-boot=yes
+            hd:
+              secure-boot-check: secure-boot=missing
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+              secure-boot-check: secure-boot=yes
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+              secure-boot-check: secure-boot=no
     Arch Linux latest:
       osinfo: archlinux
       arch: x86_64
@@ -169,6 +193,8 @@ virt-install:
       boot:
         hd:
           secure-boot-check: secure-boot=missing
+        -:
+          secure-boot-check: secure-boot=missing
         uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
           secure-boot-check: secure-boot=no
       second-machine:
@@ -181,6 +207,8 @@ virt-install:
     uefi:
       secure-boot-check: secure-boot=yes
     hd:
+      secure-boot-check: secure-boot=missing
+    -:
       secure-boot-check: secure-boot=missing
     uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
       secure-boot-check: secure-boot=yes

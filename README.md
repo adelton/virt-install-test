@@ -81,11 +81,12 @@ Example:
 
 Value of the `virt-install` `--arch` option.
 
-Supported values: `x86_64`, `aarch64`.
+Supported values: `x86_64`, `aarch64`, `-`.
 
 Default: when the `disk-url` contains strings `x86_64`, `amd64`, `aarch64`,
 or `arm64`, it is set based on the string match. Otherwise unset, using
-CPU native architecture.
+CPU native architecture. Use `-` value to explicitly not pass
+the `--arch` option to `virt-install` command.
 
 Example which explicitly runs aarch64 (arm64) VM on an x86_64 (amd64)
 runner:
@@ -161,6 +162,9 @@ lists supported values. The noteworthy ones are
 
 * `hd` to boot from BIOS;
 * `uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no` to disable Secure Boot.
+
+Use `-` value to explicitly not pass the `--boot` option
+to `virt-install` command.
 
 ### network
 
