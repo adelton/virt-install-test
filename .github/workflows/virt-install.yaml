@@ -57,7 +57,7 @@ jobs:
         run: |
           if [ -n "$INPUT_DISK_URL" ] ; then
               [ "$INPUT_ARCH" == '(guess)' ] && INPUT_ARCH=
-              cat <<EOS | yq . -o json -
+              cat <<EOS | tee /dev/stderr | yq . -o json -
                 virt-install:
                   name:
                     ${INPUT_DISK_URL##*/}:
