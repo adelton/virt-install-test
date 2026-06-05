@@ -62,14 +62,14 @@ virt-install:
         fedora42:
         generic:
           boot:
-           hd:
-             secure-boot-check: secure-boot=missing
-           -:
-             secure-boot-check: secure-boot=missing
-           uefi:
-             secure-boot-check: secure-boot=no
-           uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-             secure-boot-check: secure-boot=no
+            hd:
+              secure-boot-check: secure-boot=missing
+            -:
+              secure-boot-check: secure-boot=missing
+            uefi:
+              secure-boot-check: secure-boot=no
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+              secure-boot-check: secure-boot=no
       arch:
         x86_64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
