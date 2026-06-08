@@ -29,9 +29,6 @@ on:
       osinfo:
         description: The virt-install --osinfo argument value
         default: generic
-      boot:
-        description: The virt-install --boot argument value
-        default: uefi
       network:
         description: Space-separated values for virt-install --network arguments
         default: bridge=virbr0,model=virtio
@@ -68,7 +65,6 @@ jobs:
                       arch: "$INPUT_ARCH"
                       runs-on: $INPUT_RUNS_ON
                       osinfo: $INPUT_OSINFO
-                      boot: "$INPUT_BOOT"
                       network: $INPUT_NETWORK
                       args: $INPUT_ARGS
                       virt-customize: $INPUT_VIRT_CUSTOMIZE
@@ -96,7 +92,6 @@ jobs:
           INPUT_ARCH: ${{ inputs.arch }}
           INPUT_RUNS_ON: ${{ inputs.runs-on }}
           INPUT_OSINFO: ${{ inputs.osinfo }}
-          INPUT_BOOT: ${{ inputs.boot }}
           INPUT_NETWORK: ${{ inputs.network }}
           INPUT_ARGS: ${{ inputs.args }}
           INPUT_VM_NAME: ${{ inputs.vm-name }}
@@ -118,9 +113,8 @@ jobs:
           arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
-          boot: ${{ matrix.boot }}
           network: ${{ matrix.network }}
-          args: ${{ matrix.args }}
+          args: ${{ ( matrix.boot != '' && format('--boot {0} ', matrix.boot) ) || ''}}${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
       - uses: ./.github/actions/inventory
         with:
@@ -164,9 +158,8 @@ jobs:
           arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
-          boot: ${{ matrix.boot }}
           network: ${{ matrix.network }}
-          args: ${{ matrix.args }}
+          args: ${{ ( matrix.boot != '' && format('--boot {0} ', matrix.boot) ) || ''}}${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'recreate'
       - id: fetch-image
@@ -187,9 +180,8 @@ jobs:
           arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
-          boot: ${{ matrix.boot }}
           network: ${{ matrix.network }}
-          args: ${{ matrix.args }}
+          args: ${{ ( matrix.boot != '' && format('--boot {0} ', matrix.boot) ) || ''}}${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'local-file'
       - uses: ./.github/actions/inventory
@@ -210,9 +202,8 @@ jobs:
           arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
           osinfo: ${{ matrix.osinfo }}
-          boot: ${{ matrix.boot }}
           network: ${{ matrix.network }}
-          args: ${{ matrix.args }}
+          args: ${{ ( matrix.boot != '' && format('--boot {0} ', matrix.boot) ) || ''}}${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'multihost'
       - run: |
@@ -236,13 +227,13 @@ jobs:
         include:
           - runs-on: ubuntu-24.04
             disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64v3.vmdk
-            secure-boot-check: secure-boot=no
+            secure-boot-check: secure-boot=missing
           - runs-on: ubuntu-24.04
             disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
             secure-boot-check: secure-boot=yes
           - runs-on: ubuntu-24.04-arm
             disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
-            secure-boot-check: secure-boot=no
+            secure-boot-check: secure-boot=missing
           - runs-on: ubuntu-24.04-arm
             disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
             secure-boot-check: secure-boot=yes
@@ -254,8 +245,8 @@ jobs:
           disk-url: ${{ matrix.disk-url }}
         id: run-machine
       - run: ssh root@vm1.example.com cat /etc/os-release
-      # With default boot (uefi) and osinfo (generic), we get Secure Boot disabled on x86_64
-      # but enabled on aarch64
+      # With Ubuntu and --osinfo generic and --boot unspecified,
+      # we get Secure Boot uspecified on x86_64 but enabled on aarch64
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: vm1.example.com

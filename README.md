@@ -142,30 +142,6 @@ Default: `generic`.
 Possible values depend on the version of the `osinfo-db` package on the host,
 see [the list of `osinfo` values on Ubuntu 24.04 runners](docs/osinfo-ubuntu-24.04.md).
 
-### boot
-
-The value of `virt-install` `--boot` argument.
-
-Example:
-```
-      - uses: adelton/virt-install@master
-        with:
-          disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
-          osinfo: archlinux
-          boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
-```
-
-Default: `uefi`.
-
-The [man virt-install(1) page](https://github.com/virt-manager/virt-manager/blob/main/man/virt-install.rst#--boot)
-lists supported values. The noteworthy ones are
-
-* `hd` to boot from BIOS;
-* `uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no` to disable Secure Boot.
-
-Use `-` value to explicitly not pass the `--boot` option
-to `virt-install` command.
-
 ### network
 
 Space-separated values for `virt-install` `--network` arguments.
@@ -219,12 +195,27 @@ Example of exporting a directory to the VM:
             --filesystem source=/etc,target=host-dir,driver.type=virtiofs
 ```
 
-Note that while all of the inputs above that get turned to `virt-install`
-arguments (`arch`, `osinfo`, `network`, ...) could be specified via an
+Example of making Debian 13 actually boot without getting stuck
+finding the operating system in the image:
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2
+          osinfo: debian13
+          args: --boot uefi
+```
+
+Note that while the inputs above that get turned to `virt-install`
+arguments (`arch`, `osinfo`, `network`) could be specified via an
 appropriate value of this `args` option, having them as separate inputs
 allows the action to do additional preparation or compatibility work,
 like installing extra packages for emulated virtualization or creating
 the network from the network XML file.
+
+Default: unset.
+
+The [man virt-install(1) page](https://github.com/virt-manager/virt-manager/blob/main/man/virt-install.rst)
+documents the supported arguments.
 
 ### virt-customize
 

@@ -65,7 +65,7 @@ virt-install:
           boot:
             hd:
               secure-boot-check: secure-boot=missing
-            -:
+            '':
               secure-boot-check: secure-boot=missing
             uefi:
               secure-boot-check: secure-boot=no
@@ -108,7 +108,7 @@ virt-install:
               secure-boot-check: secure-boot=yes
             hd:
               secure-boot-check: secure-boot=yes
-            -:
+            '':
               secure-boot-check: secure-boot=yes
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
               secure-boot-check: secure-boot=yes
@@ -134,7 +134,7 @@ virt-install:
           boot:
             uefi:
               secure-boot-check: secure-boot=yes
-            -:
+            '':
               secure-boot-check: secure-boot=yes
             hd:
               secure-boot-check: secure-boot=missing
@@ -198,7 +198,7 @@ virt-install:
       boot:
         hd:
           secure-boot-check: secure-boot=missing
-        -:
+        '':
           secure-boot-check: secure-boot=missing
         uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
           secure-boot-check: secure-boot=no
@@ -215,7 +215,7 @@ virt-install:
       secure-boot-check: secure-boot=yes
     hd:
       secure-boot-check: secure-boot=missing
-    -:
+    '':
       secure-boot-check: secure-boot=missing
     uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
       secure-boot-check: secure-boot=yes
