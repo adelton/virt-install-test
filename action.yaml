@@ -211,7 +211,7 @@ runs:
         INPUT_BOOT: ${{ inputs.boot }}
         INPUT_NETWORK: ${{ steps.network-process.outputs.network }}
         LIBVIRT_DEFAULT_URI: qemu:///session
-      shell: bash
+      shell: bash -euxo pipefail {0}
     - run: |
         expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect "$INPUT_VM_NAME"
       env:
