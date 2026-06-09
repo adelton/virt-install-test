@@ -25,6 +25,8 @@ jobs:
       - uses: adelton/virt-install@master
         with:
           disk-url: https://repo.almalinux.org/almalinux/10/cloud/aarch64/images/AlmaLinux-10-GenericCloud-latest.aarch64.qcow2
+          osinfo: almalinux10
+          args: --boot uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
       - run: ssh root@vm1.example.com cat /etc/os-release
 ```
 
