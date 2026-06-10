@@ -66,6 +66,10 @@ After creating the virtual machine, the action will
 
 ## Inputs
 
+See what [values and their combinations](.github/virt-install-params.yaml)
+we saw working in our tests for various operating systems in the VMs.
+Some of those were actually necessary to avoid boot or operation failures.
+
 ### disk-url
 
 The URL of a QCOW2 image to fetch and use for the virtual machine.
