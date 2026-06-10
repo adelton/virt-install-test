@@ -112,6 +112,8 @@ virt-install:
               secure-boot-check: secure-boot=yes
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
               secure-boot-check: secure-boot=yes
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+              secure-boot-check: secure-boot=no
           virt-customize: *systemd-device-timeout
     Debian 13:
       osinfo: debian13
