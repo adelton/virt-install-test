@@ -183,8 +183,6 @@ virt-install:
       inventory: tests/inventory/openwrt-25.12-x86_64
       network: ./tests/network-192-168-1.xml
       virt-customize: >
-        --mkdir /etc/systemd/system/serial-getty@.service.d
-        --copy-in tests/after-sshd.conf:/etc/systemd/system/serial-getty@.service.d
         --edit '/etc/rc.local:s%^exit 0%ping -c1 192.168.1.254\necho "Booted, ready for login:" > /dev/console%'
       boot:
         hd:
