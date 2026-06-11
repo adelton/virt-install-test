@@ -11,8 +11,8 @@ flatten
 | sort_by(.boot, .network, .["secure-boot-check"], .["second-machine"])
 
 | map( .["runs-on"] = (
-	if .["runs-on"] == "ubuntu-24.04" then "x86_64"
-	elif .["runs-on"] == "ubuntu-24.04-arm" then "aarch64"
+	if .["runs-on"] == "ubuntu-26.04" then "x86_64"
+	elif .["runs-on"] == "ubuntu-26.04-arm" then "aarch64"
 	else "?"
 	end
 	)
