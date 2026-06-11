@@ -15,16 +15,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runs-on: ubuntu-24.04
+          - runs-on: ubuntu-26.04
             disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64v3.vmdk
             secure-boot-check: secure-boot=missing
-          - runs-on: ubuntu-24.04
+          - runs-on: ubuntu-26.04
             disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
             secure-boot-check: secure-boot=yes
-          - runs-on: ubuntu-24.04-arm
+          - runs-on: ubuntu-26.04-arm
             disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
             secure-boot-check: secure-boot=missing
-          - runs-on: ubuntu-24.04-arm
+          - runs-on: ubuntu-26.04-arm
             disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
             secure-boot-check: secure-boot=yes
     steps:
