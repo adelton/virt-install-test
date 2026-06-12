@@ -216,6 +216,7 @@ runs:
         expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect "$INPUT_VM_NAME"
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
+        LIBVIRT_DEFAULT_URI: qemu:///session
       shell: |
         bash -euo pipefail -c "echo ::group::output of: virsh console ${{ inputs.vm-name }} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
     - run: |

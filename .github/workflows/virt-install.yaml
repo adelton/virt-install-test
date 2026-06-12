@@ -142,14 +142,14 @@ jobs:
           diff <( ssh root@'${{ needs.test-plan.outputs.vm-name }}' 'mkdir /mnt/host-dir && mount -t virtiofs host-dir /mnt/host-dir && cat /mnt/host-dir/hostname' ) /etc/hostname
         if: matrix.virtiofs-test == 'test'
       - run: |
-          virsh dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath '/domain/devices/vsock' -
-          VSOCK=$( virsh dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath 'string(/domain/devices/vsock/cid/@address)' - )
+          virsh --connect qemu:///session dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath '/domain/devices/vsock' -
+          VSOCK=$( virsh --connect qemu:///session dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath 'string(/domain/devices/vsock/cid/@address)' - )
           ssh -o 'StrictHostKeyChecking accept-new' -o "ProxyCommand=socat - VSOCK-CONNECT:$VSOCK:22" root@vsock%$VSOCK cat /etc/hostname
         if: matrix.vsock-ssh-test == 'test'
 
       - run: |
-          virsh destroy '${{ needs.test-plan.outputs.vm-name }}'
-          virsh undefine --nvram '${{ needs.test-plan.outputs.vm-name }}'
+          virsh --connect qemu:///session destroy '${{ needs.test-plan.outputs.vm-name }}'
+          virsh --connect qemu:///session undefine --nvram '${{ needs.test-plan.outputs.vm-name }}'
           rm -f ~/.ssh/known_hosts
         if: matrix.second-machine == 'recreate' || matrix.second-machine == 'local-file'
       - uses: ./
