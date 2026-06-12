@@ -144,7 +144,7 @@ runs:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
       shell: bash -euxo pipefail {0}
     - run: |
-        systemctl status libvirtd.service || true
+        systemctl status libvirtd.service || sudo systemctl restart libvirtd.service
         ip a
         [ -c /dev/kvm ] && sudo chmod a+rw /dev/kvm
         sudo chmod 666 /dev/vhost-vsock
