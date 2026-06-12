@@ -151,6 +151,7 @@ runs:
         sudo mkdir /etc/qemu && echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
         sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
         sudo chmod a+rw /var/run/libvirt/libvirt-sock
+        chmod o+x ~
       shell: bash -euxo pipefail {0}
     - run: |
         IFS=' ' read -ra network <<< "$INPUT_NETWORK"
