@@ -4,7 +4,7 @@
 On Ubuntu 26.04 runners,
 supported `--osinfo` argument values are based
 on the `osinfo-db` package, currently in version
-0.20250606-0ubuntu0.26.04.1.
+0.20250606-1ubuntu2.
 Only values for distributions that haven't been marked end-of-life
 for extended period of time are shown.
 
