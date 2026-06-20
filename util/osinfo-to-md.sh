@@ -3,6 +3,9 @@
 . /etc/os-release
 
 cat <<EOS
+
+# $NAME $VERSION_ID osinfo values
+
 On $NAME $VERSION_ID runners,
 supported \`--osinfo\` argument values are based
 on the \`osinfo-db\` package, currently in version

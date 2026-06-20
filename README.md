@@ -146,7 +146,8 @@ Example:
 Default: `generic`.
 
 Possible values depend on the version of the `osinfo-db` package on the host,
-see [the list of `osinfo` values on Ubuntu 24.04 runners](docs/osinfo-ubuntu-24.04.md).
+see the list of `osinfo` values [on Ubuntu 26.04 runners](docs/osinfo-ubuntu-26.04.md)
+and [on Ubuntu 24.04 runners](docs/osinfo-ubuntu-24.04.md).
 
 ### network
 
