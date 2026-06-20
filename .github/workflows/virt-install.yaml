@@ -76,7 +76,7 @@ jobs:
               | jq -cf ./ci/generate-test-matrix.jq \
               | tee .github/virt-install.json \
               | ( echo -n 'matrix-run=' >> $GITHUB_OUTPUT ; tee -a $GITHUB_OUTPUT )
-          jq -sr -f ./ci/test-matrix-to-html.jq < .github/virt-install.json >> $GITHUB_STEP_SUMMARY
+          jq -sr -L ci -f ./ci/test-matrix-to-html.jq < .github/virt-install.json >> $GITHUB_STEP_SUMMARY
           if [ -z "$INPUT_VM_NAME" ] ; then
               INPUT_VM_NAME=machine.example.test
           fi
