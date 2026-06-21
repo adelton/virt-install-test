@@ -110,7 +110,7 @@ jobs:
         uses: ./
         with:
           disk-url: ${{ matrix.disk-url }}
-          arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
+          arch: ${{ matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           network: ${{ matrix.network }}
@@ -155,7 +155,7 @@ jobs:
       - uses: ./
         with:
           disk-url: ${{ matrix.disk-url }}
-          arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
+          arch: ${{ matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           network: ${{ matrix.network }}
@@ -177,7 +177,7 @@ jobs:
       - uses: ./
         with:
           disk-url: file://${{ github.workspace }}/${{ steps.fetch-image.outputs.local-image-file }}
-          arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
+          arch: ${{ matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           osinfo: ${{ matrix.osinfo }}
           network: ${{ matrix.network }}
@@ -199,7 +199,7 @@ jobs:
         uses: ./
         with:
           disk-url: ${{ matrix.disk-url }}
-          arch: ${{ (matrix.arch == '(guess)' && '') || matrix.arch }}
+          arch: ${{ matrix.arch }}
           vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
           osinfo: ${{ matrix.osinfo }}
           network: ${{ matrix.network }}
