@@ -91,10 +91,10 @@ virt-install:
       arch:
         x86_64:
           disk-url:
-            https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64v3.vmdk :
-            https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64v3.img :
-            https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64.vmdk :
-            https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64.img :
+            - https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64v3.vmdk
+            - https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64v3.img
+            - https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64.vmdk
+            - https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64.img
           inventory: tests/inventory/ubuntu-26.04-amd64
           runs-on:
             ubuntu-24.04:
@@ -192,8 +192,8 @@ virt-install:
         uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
           secure-boot-check: secure-boot=no
       second-machine:
-        recreate:
-        local-file:
+        - recreate
+        - local-file
       virtiofs-test: no
       vsock-ssh-test: no
 
@@ -228,7 +228,7 @@ virt-install:
   virtiofs-test: test
   vsock-ssh-test: test
 
-  exclude:
+  .exclude:
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
       secure-boot-check: secure-boot=yes
     - disk-url: https://repo.almalinux.org/almalinux/10.2/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.2-20260526.0.x86_64.qcow2
