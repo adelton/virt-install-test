@@ -47,6 +47,7 @@ def flatten_objects:
 .["virt-install"]
 | ( .[".exclude"] // [] ) as $exclude
 | ( .[".count"] // ([ .[] | select(arrays), select(objects) | length ] | max * 2) ) as $count
+| ( .[".match-set"] // [] ) as $matchset
 
 | (to_entries | map(.key | select(startswith(".") | not))[0]) as $first
 | ( [ { $first: .[ $first ] } ] | flatten_objects ) as $first_data
@@ -55,6 +56,9 @@ def flatten_objects:
 	| from_entries
 	+ $first_data[]
 ]
+| flatten_objects
+
+| [ .[] | reduce $matchset[] as $ms (.; if xcontains($ms.match) then $ms.set + . end) ]
 | flatten_objects
 
 | map(select(. as $in | any($exclude[] as $e | $in | xcontains($e)) | not))
@@ -67,7 +71,7 @@ def flatten_objects:
 | random_select($count; $at_least_once)
 
 # order keys in object for better workflow run display
-| map(. as $in | pick(.name, .arch, .["runs-on"], .boot, .["second-machine"]) + $in)
+| map(. as $in | pick(.name, .["arch-display"], .arch, .["runs-on"], .boot, .["second-machine"]) + $in)
 
-| sort_by(.name, .arch, .["runs-on"], .boot, .["second-machine"])
+| sort_by(.name, .["arch-display"], .arch, .["runs-on"], .boot, .["second-machine"])
 

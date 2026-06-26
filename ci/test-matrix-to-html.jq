@@ -30,13 +30,17 @@ def linebreaks:
 	else "?"
 	end
 )
-| .arch = ( if .arch == null then "default" else .arch[0:1] end )
 ]
 
 # raw hash of hashes with display string for combinations we will run
 | reduce .[] as $r ({}; .[ $r.boot + "<br/>" + $r.network | linebreaks ]
 	[ $r["secure-boot-check"] // "(not checked)" | linebreaks ]
-	[ $r.["second-machine"] // "(none)" ][ $r.name ][ $r.osinfo ][ $r.arch + "\u200b@\u200b" + $r["runs-on"][0:1] ] = "🔷")
+	[ $r.["second-machine"] // "(none)" ][ $r.name ][ $r.osinfo ]
+	[ $r["arch-display"][0:1]
+		+ ( if $r.arch == null or $r.arch == "" then "?"
+			elif $r["arch-display"] != $r.arch then $r.arch[0:1]
+			else "" end )
+		+ "\u200b@\u200b" + $r["runs-on"][0:1] ] = "🔷")
 | . as $data
 
 # set the top data (the rows in the table) as sorted to_entries
