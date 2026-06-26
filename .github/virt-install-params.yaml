@@ -1,9 +1,5 @@
 
 virt-install:
-  runs-on:
-    - ubuntu-24.04
-    - ubuntu-24.04-arm
-
   name:
     AlmaLinux 10.2:
       osinfo: almalinux10
@@ -196,6 +192,10 @@ virt-install:
         - local-file
       virtiofs-test: no
       vsock-ssh-test: no
+
+  runs-on:
+    - ubuntu-24.04
+    - ubuntu-24.04-arm
 
   osinfo: linux2024
 
