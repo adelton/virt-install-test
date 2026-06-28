@@ -189,6 +189,13 @@ runs:
         args=()
         [ "$INPUT_OSINFO" = generic ] && args+=( --memory 2000 )
         [ -n "$INPUT_ARCH" ] && [ "$INPUT_ARCH" != '-' ] && args+=( --arch "$INPUT_ARCH" )
+        if libvirtd --version | grep -Fq ' 12.' ; then
+          if [ "$INPUT_ARCH" = 'aarch64' ] \
+            || [ "$UNAME" = 'aarch64' -a -z "$INPUT_ARCH" ] \
+            || [ "$UNAME" = 'aarch64' -a "$INPUT_ARCH" = '-' ] ; then
+            args+=( --cpu neoverse-v1 )
+          fi
+        fi
         IFS=' ' read -ra network <<< "$INPUT_NETWORK" ; for n in "${network[@]}"; do args+=( --network "$n" ) ; done
         [ -n "$INPUT_ARGS" ] && while read a ; do args+=( "$a" ) ; done < <( printf '%s\n' "$INPUT_ARGS" | xargs printf '%s\n' )
         (
@@ -210,6 +217,7 @@ runs:
         INPUT_OSINFO: ${{ inputs.osinfo }}
         INPUT_NETWORK: ${{ steps.network-process.outputs.network }}
         INPUT_ARGS: ${{ inputs.args }}
+        UNAME: ${{ steps.uname.outputs.uname }}
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: bash -euxo pipefail {0}
     - run: |
