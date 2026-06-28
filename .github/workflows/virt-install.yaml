@@ -144,7 +144,9 @@ jobs:
       - run: |
           virsh --connect qemu:///session dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath '/domain/devices/vsock' -
           VSOCK=$( virsh --connect qemu:///session dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath 'string(/domain/devices/vsock/cid/@address)' - )
-          ssh -o 'StrictHostKeyChecking accept-new' -o "ProxyCommand=socat - VSOCK-CONNECT:$VSOCK:22" root@vsock%$VSOCK cat /etc/hostname
+          ssh_opts=( -o 'StrictHostKeyChecking accept-new' )
+          [ -f /etc/ssh/ssh_config.d/20-systemd-ssh-proxy.conf ] || ssh_opts+=( -o "ProxyCommand=socat - VSOCK-CONNECT:$VSOCK:22" )
+          ssh "${ssh_opts[@]}" root@vsock%$VSOCK cat /etc/hostname
         if: matrix.vsock-ssh-test == 'test'
 
       - run: |
