@@ -10,16 +10,23 @@ flatten
 
 | sort_by(.boot, .network, .["secure-boot-check"], .["second-machine"])
 
-| [ .[] | .["runs-on"] = (
+| map( .["runs-on"] = (
 	if .["runs-on"] == "ubuntu-24.04" then "x86_64"
 	elif .["runs-on"] == "ubuntu-24.04-arm" then "aarch64"
 	else "?"
 	end
+	)
+	|
+	.boot = (
+	if (.boot // "") != "" then "--boot " + .boot
+	else (.args // "") | (match("--boot[ =][^ ]+") | .string) // null
+	end
+	)
 )
-]
 
 # raw hash of hashes with display string for combinations we will run
-| reduce .[] as $r ({}; .[ $r.boot + "<br/>" + $r.network | linebreaks ]
+| reduce .[] as $r ({};
+	.[ if ($r.boot // "") != "" then $r.boot else "(no --boot)" end + "\n<br/>\u2014\u2014<br/>\n" + $r.network | linebreaks ]
 	[ $r["secure-boot-check"] // "(not checked)" | linebreaks ]
 	[ $r.["second-machine"] // "(none)" ][ $r.name ][ $r.osinfo ]
 	[ $r["arch-display"][0:1]
@@ -31,6 +38,6 @@ flatten
 
 | matrix_to_html::table(
 	"Image / osinfo / arch @ host arch";
-	[ "Boot / network", "Secure Boot", "Second machine" ]
+	[ "Boot \n<br/>\u2014\u2014<br/>\n network", "Secure Boot", "Second machine" ]
 )
 
