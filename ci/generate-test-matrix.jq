@@ -45,7 +45,7 @@ def flatten_objects:
 ;
 
 .["virt-install"]
-| ( .[".exclude"] // [] ) as $exclude
+| ( .[".exclude"] // [] | flatten_objects ) as $exclude
 | ( .[".count"] // ([ .[] | select(arrays), select(objects) | length ] | max * 2) ) as $count
 | ( .[".match-set"] // [] ) as $matchset
 
