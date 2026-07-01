@@ -19,7 +19,6 @@ for extended period of time are shown.
     - `alpinelinux3.19`: [Alpine Linux 3.19](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/alpinelinux.org/alpinelinux-3.19.xml.in)
 - alt
     - `alt10.3`: [ALT 10.3](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/altlinux.org/alt-10.3.xml.in)
-    - `alt10.2`: [ALT 10.2](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/altlinux.org/alt-10.2.xml.in)
     - `alt.p10`: [ALT p10 StarterKits](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/altlinux.org/alt-p10.starterkits.xml.in)
     - `alt.p11`: [ALT p11 StarterKits](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/altlinux.org/alt-p11.starterkits.xml.in)
     - `alt.p8`: [ALT p8 StarterKits](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/altlinux.org/alt-p8.starterkits.xml.in)
@@ -103,7 +102,6 @@ for extended period of time are shown.
     - `silverblue-unknown`: [Fedora Silverblue](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/fedoraproject.org/silverblue-unknown.xml.in)
 - freebsd
     - `freebsd14.2`: [FreeBSD 14.2](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/freebsd.org/freebsd-14.2.xml.in)
-    - `freebsd13.4`: [FreeBSD 13.4](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/freebsd.org/freebsd-13.4.xml.in)
     - `freebsd4.5`: [FreeBSD 4.5](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/freebsd.org/freebsd-4.5.xml.in)
     - `freebsd4.4`: [FreeBSD 4.4](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/freebsd.org/freebsd-4.4.xml.in)
     - `freebsd4.3`: [FreeBSD 4.3](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/freebsd.org/freebsd-4.3.xml.in)
