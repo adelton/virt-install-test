@@ -44,6 +44,7 @@ jobs:
           network: ${{ matrix.network }}
           args: ${{ ( matrix.boot != '' && format('--boot {0} ', matrix.boot) ) || ''}}${{ matrix.args }}
           virt-customize: ${{ matrix.virt-customize }}
+          console-output-file: virsh-console.log
         id: virt-install
         continue-on-error: true
       - uses: ./.github/actions/secure-boot-check
@@ -54,6 +55,17 @@ jobs:
       - name: Check that running the action with the .exclude combination failed
         if: steps.virt-install.outcome == 'failure'
         run: true
+      - name: The console output is empty
+        if: steps.virt-install.outcome == 'failure' && matrix.virsh-console-output-empty
+        run: if test -s virsh-console.log ; then false ; fi
+        env:
+          INPUT_CONSOLE_OUTPUT: ${{ matrix.virsh-console-output-empty }}
+      - name: Check errors in the console output
+        if: steps.virt-install.outcome == 'failure' && matrix.virsh-console-output != ''
+        run: grep -Fq "$INPUT_CONSOLE_OUTPUT" virsh-console.log
+        env:
+          INPUT_CONSOLE_OUTPUT: ${{ matrix.virsh-console-output }}
+
       - name: Fail if the action passed
         if: steps.virt-install.outcome == 'success'
         run: false

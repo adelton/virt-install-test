@@ -46,7 +46,7 @@ def flatten_objects:
 
 .["virt-install"]
 | ( .[".include"] // [] | flatten_objects ) as $include
-| ( .[".exclude"] // [] | flatten_objects ) as $exclude
+| ( [ .[".exclude"] // [] | flatten_objects[] | [ paths[] | select(startswith(".")) ] as $p | delpaths([$p[] | [.]]) ] ) as $exclude
 | ( .[".count"] // ([ .[] | select(arrays), select(objects) | length ] | max * 2) ) as $count
 | ( .[".match-set"] // [] ) as $matchset
 
@@ -63,7 +63,10 @@ def flatten_objects:
 | flatten_objects
 
 | if $include | length > 0 then
-	map(select(. as $in | any($include[] as $i | $in | xcontains($i))))
+	[ .[] as $in | first($include[] | select(
+		[ paths[] | select(startswith(".")) ] as $p | delpaths([$p[] | [.]]) as $i
+		| $in | xcontains($i)))
+		| $in + ( with_entries( if .key | startswith(".") then .key = .key[1:] end ) ) ]
 	end
 | map(select(. as $in | any($exclude[] as $e | $in | xcontains($e)) | not))
 
