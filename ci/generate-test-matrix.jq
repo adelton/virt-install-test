@@ -45,6 +45,7 @@ def flatten_objects:
 ;
 
 .["virt-install"]
+| ( .[".include"] // [] | flatten_objects ) as $include
 | ( .[".exclude"] // [] | flatten_objects ) as $exclude
 | ( .[".count"] // ([ .[] | select(arrays), select(objects) | length ] | max * 2) ) as $count
 | ( .[".match-set"] // [] ) as $matchset
@@ -61,6 +62,9 @@ def flatten_objects:
 | [ .[] | reduce $matchset[] as $ms (.; if xcontains($ms.match) then $ms.set + . end) ]
 | flatten_objects
 
+| if $include | length > 0 then
+	map(select(. as $in | any($include[] as $i | $in | xcontains($i))))
+	end
 | map(select(. as $in | any($exclude[] as $e | $in | xcontains($e)) | not))
 
 | (reduce ( [ .[] | to_entries[] ] | unique[] ) as $i ({};

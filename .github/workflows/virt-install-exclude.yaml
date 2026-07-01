@@ -1,0 +1,60 @@
+name: Test failures of excluded combinations
+on:
+  push:
+    branches:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  test-plan:
+    name: Generate test plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    if: github.event_name != 'schedule' || github.repository == 'adelton/virt-install'
+    outputs:
+      matrix-run: ${{ steps.produce-matrix.outputs.matrix-run }}
+      vm-name: ${{ steps.produce-matrix.outputs.vm-name }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: produce-matrix
+        run: |
+          yq . -o json .github/virt-install-params.yaml \
+              | jq '.["virt-install"][".include"] = .["virt-install"][".exclude"] | del(.["virt-install"][".exclude"]) | .["virt-install"]["second-machine"] = [ "(none)" ]' \
+              | tee /dev/stderr \
+              | jq -cf ./ci/generate-test-matrix.jq \
+              | tee .github/virt-install.json \
+              | ( echo -n 'matrix-run=' >> $GITHUB_OUTPUT ; tee -a $GITHUB_OUTPUT )
+          jq -sr -L ci -f ./ci/test-matrix-to-html.jq < .github/virt-install.json >> $GITHUB_STEP_SUMMARY
+        shell: bash -euxo pipefail {0}
+  virt-install:
+    runs-on: ${{ matrix.runs-on }}
+    needs: [ test-plan ]
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.test-plan.outputs.matrix-run) }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./
+        with:
+          disk-url: ${{ matrix.disk-url }}
+          arch: ${{ matrix.arch }}
+          osinfo: ${{ matrix.osinfo }}
+          network: ${{ matrix.network }}
+          args: ${{ ( matrix.boot != '' && format('--boot {0} ', matrix.boot) ) || ''}}${{ matrix.args }}
+          virt-customize: ${{ matrix.virt-customize }}
+        id: virt-install
+        continue-on-error: true
+      - uses: ./.github/actions/secure-boot-check
+        with:
+          vm-name: vm1.example.com
+        if: steps.virt-install.outcome == 'success'
+
+      - name: Check that running the action with the .exclude combination failed
+        if: steps.virt-install.outcome == 'failure'
+        run: true
+      - name: Fail if the action passed
+        if: steps.virt-install.outcome == 'success'
+        run: false
+
