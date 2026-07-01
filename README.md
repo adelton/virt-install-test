@@ -254,6 +254,21 @@ as shown in the example above.
 
 Default: unset, meaning `virt-customize` will not be run.
 
+### console-output-file
+
+Output of the `virsh console` that the action runs to observe the VM
+startup is also logged to a file.
+
+Default: unset, console output not stored in a file.
+
+Example:
+```
+      - uses: adelton/virt-install@master
+        with:
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64.img
+          console-output-file: virsh-console-vm1.out
+```
+
 ## Outputs
 
 ### ip-address

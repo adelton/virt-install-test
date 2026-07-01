@@ -19,6 +19,8 @@ inputs:
     description: Generic virt-install arguments
   virt-customize:
     description: Arguments to virt-customize to be run on the image (optional)
+  console-output-file:
+    description: File to log VM console output to (optional)
 outputs:
   ip-address:
     description: IP address that the VM got (if available)
@@ -221,9 +223,10 @@ runs:
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: bash -euxo pipefail {0}
     - run: |
-        expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect "$INPUT_VM_NAME"
+        expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect "$INPUT_VM_NAME" "$INPUT_CONSOLE_OUTPUT"
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
+        INPUT_CONSOLE_OUTPUT: ${{ inputs.console-output-file }}
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: |
         bash -euo pipefail -c "echo ::group::output of: virsh console ${{ inputs.vm-name }} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
