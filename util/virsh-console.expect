@@ -13,20 +13,21 @@ if {$LOG_FILE ne ""} { log_file "$LOG_FILE" }
 
 set timeout 90
 set start [clock seconds]
+
+expect_after timeout { puts "No input received for $timeout seconds." ; exit 3 }
 expect {
 	"login:" { send \x04; puts \n; }
 	"BdsDxe: No bootable option or device was found." {
+		expect_after timeout { puts "UEFI did not find operating system to boot." ; exit 3 }
 		# Output any BdsDxe message right after this error
 		expect {
 			-timeout 10
 			-re "BdsDxe:.*$" { exp_continue }
 			-re "\n........"
-			timeout { puts "UEFI did not find operating system to boot." ; exit 3 }
 		}
 	}
 	-re {.\n} {
 		if {[clock seconds] - $start >= 600} { puts "Waiting for login prompt timed out." ; exit 1 }
 		exp_continue
 	}
-	timeout { puts "No input received for $timeout seconds." ; exit 3 }
 }
