@@ -6,18 +6,24 @@ spawn -noecho virsh -e "^D" console "$DOMAIN"
 set timeout 10
 expect_after timeout { puts "Waiting for connection to domain timed out." ; exit 2 }
 expect "Connected to domain" { send \r }
+expect -ex "Escape character is ^D (Ctrl + D)"
 
-set timeout 600
-expect_after timeout { puts "Waiting for login prompt timed out." ; exit 1 }
+set timeout 90
+set start [clock seconds]
 expect {
+	"login:" { send \x04; puts \n; }
 	"BdsDxe: No bootable option or device was found." {
 		# Output any BdsDxe message right after this error
 		expect {
+			-timeout 10
 			-re "BdsDxe:.*$" { exp_continue }
+			-re "\n........"
 			timeout { puts "UEFI did not find operating system to boot." ; exit 3 }
-			-timeout 10 -re "\n........"
 		}
+	}
+	-re {.\n} {
+		if {[clock seconds] - $start >= 600} { puts "Waiting for login prompt timed out." ; exit 1 }
 		exp_continue
 	}
-	"login:" { send \x04; puts \n; }
+	timeout { puts "No input received for $timeout seconds." ; exit 3 }
 }
