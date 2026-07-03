@@ -223,6 +223,7 @@ virt-install:
     - recreate
     - local-file
     - multihost
+    - (none)
 
   args:
     - >
@@ -265,6 +266,19 @@ virt-install:
           - aarch64
 
   .exclude:
+    - second-machine:
+        - recreate
+        - local-file
+        - multihost
+      runs-on: ubuntu-24.04-arm
+      .no-exclude-test: true
+    - second-machine:
+        - recreate
+        - local-file
+        - multihost
+      arch-display: aarch64
+      runs-on: ubuntu-24.04
+      .no-exclude-test: true
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
       secure-boot-check: secure-boot=yes
       .virsh-console-output: |

@@ -45,6 +45,10 @@ def flatten_objects:
 ;
 
 .["virt-install"]
+| if $ARGS.named["reverse-exclude"] then
+	.[".include"] = ( .[".exclude"] | map(select(getpath([".no-exclude-test"]) | not)) )
+	| .[".exclude"] = ( .[".exclude"] | map(select(getpath([".no-exclude-test"]))) )
+	end
 | ( .[".include"] // [] | flatten_objects ) as $include
 | ( [ .[".exclude"] // [] | flatten_objects[] | [ paths[] | select(startswith(".")) ] as $p | delpaths([$p[] | [.]]) ] ) as $exclude
 | ( .[".count"] // ([ .[] | select(arrays), select(objects) | length ] | max * 2) ) as $count

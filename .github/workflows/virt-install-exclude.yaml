@@ -19,9 +19,8 @@ jobs:
       - id: produce-matrix
         run: |
           yq . -o json .github/virt-install-params.yaml \
-              | jq '.["virt-install"][".include"] = .["virt-install"][".exclude"] | del(.["virt-install"][".exclude"]) | .["virt-install"]["second-machine"] = [ "(none)" ]' \
               | tee /dev/stderr \
-              | jq -cf ./ci/generate-test-matrix.jq \
+              | jq -cf ./ci/generate-test-matrix.jq --argjson reverse-exclude true \
               | tee .github/virt-install.json \
               | ( echo -n 'matrix-run=' >> $GITHUB_OUTPUT ; tee -a $GITHUB_OUTPUT )
           jq -sr -L ci -f ./ci/test-matrix-to-html.jq < .github/virt-install.json >> $GITHUB_STEP_SUMMARY
