@@ -10,9 +10,6 @@ virt-install:
         aarch64:
           disk-url: https://repo.almalinux.org/almalinux/10.2/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.2-20260526.0.aarch64.qcow2
           inventory: tests/inventory/almalinux-10-aarch64
-          boot: &boot-no-secure-boot
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-              secure-boot-check: secure-boot=no
     Fedora 44 (no cloud-init):
       osinfo: fedora42
       arch-display:
@@ -51,20 +48,20 @@ virt-install:
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-44-1.7.aarch64.qcow2
           inventory: tests/inventory/fedora-44-aarch64
-          boot:
-            <<: *boot-no-secure-boot
           virt-customize: *systemd-device-timeout
     Fedora 43:
       osinfo:
         fedora42:
         generic:
           boot:
+            uefi:
+              secure-boot-check: secure-boot=no
             hd:
               secure-boot-check: secure-boot=missing
             '':
               secure-boot-check: secure-boot=missing
-            uefi:
-              secure-boot-check: secure-boot=no
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+              secure-boot-check: secure-boot=excluded
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
               secure-boot-check: secure-boot=no
       arch-display:
@@ -78,8 +75,6 @@ virt-install:
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
           inventory: tests/inventory/fedora-43-aarch64
-          boot:
-            <<: *boot-no-secure-boot
           virt-customize: *systemd-device-timeout
       vsock-ssh-test: no
     Ubuntu 26.04:
@@ -117,13 +112,6 @@ virt-install:
         x86_64:
           disk-url: https://cloud.debian.org/images/cloud/trixie/20260518-2482/debian-13-genericcloud-amd64-20260518-2482.qcow2
           inventory: tests/inventory/debian-13-amd64
-          boot:
-            uefi:
-              secure-boot-check: secure-boot=yes
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-              secure-boot-check: secure-boot=yes
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-              secure-boot-check: secure-boot=no
         aarch64:
           disk-url: https://cloud.debian.org/images/cloud/trixie/20260518-2482/debian-13-genericcloud-arm64-20260518-2482.qcow2
           inventory: tests/inventory/debian-13-arm64
@@ -147,8 +135,6 @@ virt-install:
         aarch64:
           disk-url: https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.3-aarch64-uefi-cloudinit-r0.qcow2
           inventory: tests/inventory/alpine-linux-3.23-aarch64
-      boot:
-        <<: *boot-no-secure-boot
       virt-customize: >
         --edit '/etc/shadow:s/^root:!\*:/root:*:/'
       vsock-ssh-test: no
@@ -158,13 +144,6 @@ virt-install:
         x86_64:
           disk-url: https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2
           inventory: tests/inventory/opensuse-tumbleweed
-          boot:
-            uefi:
-              secure-boot-check: secure-boot=yes
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-              secure-boot-check: secure-boot=yes
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-              secure-boot-check: secure-boot=no
         aarch64:
           disk-url: https://download.opensuse.org/ports/aarch64/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.aarch64-Cloud.qcow2
           inventory: tests/inventory/opensuse-tumbleweed
@@ -184,13 +163,6 @@ virt-install:
       network: ./tests/network-192-168-1.xml
       virt-customize: >
         --edit '/etc/rc.local:s%^exit 0%ping -c1 192.168.1.254\necho "Booted, ready for login:" > /dev/console%'
-      boot:
-        hd:
-          secure-boot-check: secure-boot=missing
-        '':
-          secure-boot-check: secure-boot=missing
-        uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-          secure-boot-check: secure-boot=no
       second-machine:
         - recreate
         - local-file
@@ -277,15 +249,8 @@ virt-install:
         - local-file
         - multihost
       arch-display: aarch64
-      runs-on: ubuntu-24.04
       .no-exclude-test: true
-    - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
-      secure-boot-check: secure-boot=yes
-      .virsh-console-output: |
-        BdsDxe: loading Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x4)/Pci(0x0,0x0)
-        BdsDxe: failed to load Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x4)/Pci(0x0,0x0): Access Denied
-        BdsDxe: No bootable option or device was found.
-        BdsDxe: Press any key to enter the Boot Manager Menu.
+
     - disk-url: https://repo.almalinux.org/almalinux/10.2/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.2-20260526.0.x86_64.qcow2
       runs-on: ubuntu-24.04-arm
       boot:
@@ -307,6 +272,59 @@ virt-install:
         - hd
         - ''
       .virsh-console-output-empty: true
+    - disk-url:
+        - https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.3-x86_64-uefi-cloudinit-r0.qcow2
+        - https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
+        - https://downloads.openwrt.org/releases/25.12.2/targets/x86/64/openwrt-25.12.2-x86-64-generic-ext4-combined-efi.img.gz
+      boot:
+        - uefi
+        - uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes
+      .virsh-console-output: |
+        BdsDxe: loading Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x4)/Pci(0x0,0x0)
+        BdsDxe: failed to load Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x4)/Pci(0x0,0x0): Access Denied
+        BdsDxe: No bootable option or device was found.
+        BdsDxe: Press any key to enter the Boot Manager Menu.
+    - disk-url:
+        - https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.3-x86_64-uefi-cloudinit-r0.qcow2
+        - https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2
+      boot:
+        - hd
+        - ''
+      .virsh-console-output-empty: true
+    - disk-url:
+        - https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-44-1.7.aarch64.qcow2
+      boot:
+        - uefi
+        - hd
+        - ''
+        - uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes
+      .virsh-console-output: Verification failed: (0x1A) Security Violation
+    - disk-url:
+        - https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.3-aarch64-uefi-cloudinit-r0.qcow2
+        - https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2
+      boot:
+        - uefi
+        - hd
+        - ''
+        - uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes
+      .virsh-console-output: |
+        BdsDxe: loading Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x5)/Pci(0x0,0x0)
+        BdsDxe: failed to load Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x5)/Pci(0x0,0x0): Access Denied
+        BdsDxe: loading Boot0002 "EFI Internal Shell" from Fv(64074AFE-340A-4BE6-94BA-91B5B4D0F71E)/FvFile(7C04A583-9E3E-4F1C-AD65-E05268D0B4D1)
+        BdsDxe: starting Boot0002 "EFI Internal Shell" from Fv(64074AFE-340A-4BE6-94BA-91B5B4D0F71E)/FvFile(7C04A583-9E3E-4F1C-AD65-E05268D0B4D1)
+        BdsDxe: failed to start Boot0002 "EFI Internal Shell" from Fv(64074AFE-340A-4BE6-94BA-91B5B4D0F71E)/FvFile(7C04A583-9E3E-4F1C-AD65-E05268D0B4D1): Security Violation
+        BdsDxe: No bootable option or device was found.
+        BdsDxe: Press any key to enter the Boot Manager Menu.
+    - disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
+      osinfo: generic
+      boot: uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes
+      # ERROR    operation failed: Unable to find 'efi' firmware that is compatible with the current configuration
+      # Domain installation does not appear to have been successful.
+    - disk-url: https://cloud.debian.org/images/cloud/trixie/20260518-2482/debian-13-genericcloud-amd64-20260518-2482.qcow2
+      boot:
+        - hd
+        - ''
+      .virsh-console-output: "Booting `Debian GNU/Linux'"
     - disk-url:
         - https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64v3.vmdk
         - https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-amd64v3.img
