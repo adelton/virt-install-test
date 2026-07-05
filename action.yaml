@@ -212,7 +212,6 @@ runs:
         echo '::group::domain XML'
         virsh dumpxml "$INPUT_VM_NAME"
         echo '::endgroup::'
-        virsh start "$INPUT_VM_NAME"
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
         INPUT_ARCH: ${{ steps.image-arch.outputs.arch }}
@@ -223,13 +222,13 @@ runs:
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: bash -euxo pipefail {0}
     - run: |
-        expect "$GITHUB_ACTION_PATH"/util/virsh-console.expect "$INPUT_VM_NAME" "$INPUT_CONSOLE_OUTPUT"
+        expect "$GITHUB_ACTION_PATH"/util/virsh-start-console.expect "$INPUT_VM_NAME" "$INPUT_CONSOLE_OUTPUT"
       env:
         INPUT_VM_NAME: ${{ inputs.vm-name }}
         INPUT_CONSOLE_OUTPUT: ${{ inputs.console-output-file }}
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: |
-        bash -euo pipefail -c "echo ::group::output of: virsh console ${{ inputs.vm-name }} ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
+        bash -euo pipefail -c "echo ::group::output of: virsh start ${{ inputs.vm-name }} --console ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
     - run: |
         MAC=$( virsh --connect qemu:///session dumpxml "$INPUT_VM_NAME" | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
         IP=

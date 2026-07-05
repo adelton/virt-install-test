@@ -2,11 +2,12 @@
 set DOMAIN [lindex $argv 0]
 set LOG_FILE [lindex $argv 1]
 
-spawn -noecho virsh -e "^D" console "$DOMAIN"
+spawn -noecho virsh -e "^D" start "$DOMAIN" --console
 
 set timeout 10
 expect_after timeout { puts "Waiting for connection to domain timed out." ; exit 2 }
-expect "Connected to domain" { send \r }
+expect -ex "Domain '$DOMAIN' started"
+expect -ex "Connected to domain '$DOMAIN'" { send \r }
 expect -ex "Escape character is ^D (Ctrl + D)"
 
 if {$LOG_FILE ne ""} { log_file "$LOG_FILE" }
