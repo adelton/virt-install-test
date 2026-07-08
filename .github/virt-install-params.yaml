@@ -289,14 +289,18 @@ virt-install:
     - disk-url: https://repo.almalinux.org/almalinux/10.2/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.2-20260526.0.x86_64.qcow2
       runs-on: ubuntu-24.04-arm
       boot:
-        - uefi
-        - uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes
-        - uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
-      .virsh-console-output: |
-        BdsDxe: loading Boot0002 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
-        BdsDxe: starting Boot0002 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
-        !!!! X64 Exception Type - 06(#UD - Invalid Opcode)  CPU Apic ID - 00000000 !!!!
-        RIP  - 000000005C3CD347, CS  - 0000000000000038, RFLAGS - 0000000000000246
+        uefi:
+          .virsh-console-output: &almalinux-arch-exception-secure-boot |
+            BdsDxe: loading Boot0002 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
+            BdsDxe: starting Boot0002 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
+            !!!! X64 Exception Type - 06(#UD - Invalid Opcode)  CPU Apic ID - 00000000 !!!!
+        uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+          .virsh-console-output: *almalinux-arch-exception-secure-boot
+        uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+          .virsh-console-output: |
+            BdsDxe: loading Boot0003 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
+            BdsDxe: starting Boot0003 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
+            !!!! X64 Exception Type - 06(#UD - Invalid Opcode)  CPU Apic ID - 00000000 !!!!
     - disk-url: https://repo.almalinux.org/almalinux/10.2/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.2-20260526.0.x86_64.qcow2
       runs-on: ubuntu-24.04-arm
       boot:

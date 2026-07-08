@@ -61,7 +61,7 @@ jobs:
           INPUT_CONSOLE_OUTPUT: ${{ matrix.virsh-console-output-empty }}
       - name: Check errors in the console output
         if: steps.virt-install.outcome == 'failure' && matrix.virsh-console-output != ''
-        run: grep -Fq "$INPUT_CONSOLE_OUTPUT" virsh-console.log
+        run: tr -s '\r\n' '\3' < virsh-console.log | grep -Fq "$( printf '%s' "$INPUT_CONSOLE_OUTPUT" | tr '\n' '\3' )"
         env:
           INPUT_CONSOLE_OUTPUT: ${{ matrix.virsh-console-output }}
 
