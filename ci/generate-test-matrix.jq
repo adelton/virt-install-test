@@ -63,6 +63,8 @@ def flatten_objects:
 ]
 | flatten_objects
 
+| if $ARGS.named["reverse-exclude"] then map(.["second-machine"] = "(none)") end
+
 | [ .[] | reduce $matchset[] as $ms (.; if xcontains($ms.match) then $ms.set + . end) ]
 | flatten_objects
 
