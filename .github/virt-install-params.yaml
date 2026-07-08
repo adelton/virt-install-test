@@ -282,7 +282,7 @@ virt-install:
     - disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
       secure-boot-check: secure-boot=yes
       .virsh-console-output: |
-        3h3hBdsDxe: loading Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x4)/Pci(0x0,0x0)
+        BdsDxe: loading Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x4)/Pci(0x0,0x0)
         BdsDxe: failed to load Boot0001 "UEFI Misc Device" from PciRoot(0x0)/Pci(0x1,0x4)/Pci(0x0,0x0): Access Denied
         BdsDxe: No bootable option or device was found.
         BdsDxe: Press any key to enter the Boot Manager Menu.
@@ -293,7 +293,7 @@ virt-install:
         - uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes
         - uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
       .virsh-console-output: |
-        3h3hBdsDxe: loading Boot0002 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
+        BdsDxe: loading Boot0002 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
         BdsDxe: starting Boot0002 "AlmaLinux" from HD(2,GPT,5FF7AC71-CA65-44A3-B03F-AC7935F98D42,0x1000,0x64000)/\EFI\almalinux\shimx64.efi
         !!!! X64 Exception Type - 06(#UD - Invalid Opcode)  CPU Apic ID - 00000000 !!!!
         RIP  - 000000005C3CD347, CS  - 0000000000000038, RFLAGS - 0000000000000246
