@@ -10,7 +10,15 @@ virt-install:
         aarch64:
           disk-url: https://repo.almalinux.org/almalinux/10.2/cloud/aarch64/images/AlmaLinux-10-GenericCloud-10.2-20260526.0.aarch64.qcow2
           inventory: tests/inventory/almalinux-10-aarch64
-          boot: &boot-no-secure-boot
+          boot: &boot-hd-also-secure-boot
+            uefi:
+              secure-boot-check: secure-boot=yes
+            hd:
+              secure-boot-check: secure-boot=yes
+            '':
+              secure-boot-check: secure-boot=yes
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
+              secure-boot-check: secure-boot=yes
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
               secure-boot-check: secure-boot=no
     Fedora 44 (no cloud-init):
@@ -51,8 +59,9 @@ virt-install:
         aarch64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-44-1.7.aarch64.qcow2
           inventory: tests/inventory/fedora-44-aarch64
-          boot:
-            <<: *boot-no-secure-boot
+          boot: &boot-no-secure-boot
+            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
+              secure-boot-check: secure-boot=no
           virt-customize: *systemd-device-timeout
     Fedora 43:
       osinfo:
@@ -99,17 +108,8 @@ virt-install:
         aarch64:
           disk-url: https://cloud-images.ubuntu.com/releases/resolute/release-20260421/ubuntu-26.04-server-cloudimg-arm64.img
           inventory: tests/inventory/ubuntu-26.04-arm64
-          boot: &boot-hd-also-secure-boot
-            uefi:
-              secure-boot-check: secure-boot=yes
-            hd:
-              secure-boot-check: secure-boot=yes
-            '':
-              secure-boot-check: secure-boot=yes
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-              secure-boot-check: secure-boot=yes
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-              secure-boot-check: secure-boot=no
+          boot:
+            <<: *boot-hd-also-secure-boot
           virt-customize: *systemd-device-timeout
     Debian 13:
       osinfo: debian13
