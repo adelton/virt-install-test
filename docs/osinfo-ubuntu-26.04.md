@@ -319,7 +319,6 @@ for extended period of time are shown.
 - ubuntu
     - `ubuntu25.10`: [Ubuntu 25.10](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/ubuntu.com/ubuntu-25.10.xml.in)
     - `ubuntu25.04`: [Ubuntu 25.04](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/ubuntu.com/ubuntu-25.04.xml.in)
-    - `ubuntu24.10`: [Ubuntu 24.10](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/ubuntu.com/ubuntu-24.10.xml.in)
     - `ubuntu24.04`: [Ubuntu 24.04 LTS](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/ubuntu.com/ubuntu-24.04.xml.in)
     - `ubuntu22.04`: [Ubuntu 22.04 LTS](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/ubuntu.com/ubuntu-22.04.xml.in)
     - `ubuntu20.04`: [Ubuntu 20.04 LTS](https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/os/ubuntu.com/ubuntu-20.04.xml.in)
