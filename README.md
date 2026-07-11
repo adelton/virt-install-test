@@ -20,23 +20,24 @@ jobs:
           disk-url: https://repo.almalinux.org/almalinux/10/cloud/x86_64/images/AlmaLinux-10-GenericCloud-latest.x86_64.qcow2
       - run: ssh root@vm1.example.com cat /proc/cmdline
   virt-install-almalinux-aarch64:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     steps:
       - uses: adelton/virt-install@master
         with:
           disk-url: https://repo.almalinux.org/almalinux/10/cloud/aarch64/images/AlmaLinux-10-GenericCloud-latest.aarch64.qcow2
           osinfo: almalinux10
-          args: --boot uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
       - run: ssh root@vm1.example.com cat /etc/os-release
 ```
 
 This action has been tested on GitHub hosted runners
+`ubuntu-26.04`, `ubuntu-26.04-arm`,
 `ubuntu-24.04` (`ubuntu-latest`) and `ubuntu-24.04-arm`.
-Note that the `ubuntu-24.04-arm` hosted runners do not enable
+Note that the `ubuntu-*-arm` hosted runners do not enable
 nested virtualization so even ARM virtual machines will run
 emulated on them and thus slower than the x86_64/amd64 VMs
-on the `ubuntu-24.04` runners. When running non-matching architectures
-(x86_64 on `ubuntu-24.04-arm` or aarch64 on `ubuntu-24.04`), virtual
+on the `ubuntu-26.04` and `ubuntu-24.04` runners.
+When running non-matching architectures (x86_64 on `ubuntu-*-arm`
+or aarch64 on `ubuntu-26.04` or `ubuntu-24.04`), virtual
 machines will of course run emulated as well.
 
 Before running `virt-install`, this action
@@ -158,7 +159,7 @@ created:
 ```
       - uses: adelton/virt-install@master
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64.img
           network: bridge=custom1
 ```
 
@@ -188,7 +189,7 @@ Example of enabling a vsock host/guest interface for the VM:
 ```
       - uses: adelton/virt-install@master
         with:
-          disk-url: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img
+          disk-url: https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64.img
           args: --vsock cid.auto=yes
 ```
 

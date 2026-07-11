@@ -20,9 +20,11 @@ on:
         description: Runner
         type: choice
         options:
+          - ubuntu-26.04
+          - ubuntu-26.04-arm
           - ubuntu-24.04
           - ubuntu-24.04-arm
-        default: ubuntu-24.04
+        default: ubuntu-26.04
       vm-name:
         description: Name of the VM (libvirt domain)
         default: vm1.example.com
