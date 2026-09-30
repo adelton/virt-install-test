@@ -123,14 +123,17 @@ jobs:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           compare-dir: ${{ matrix.inventory }}
         if: inputs.disk-url == ''
+        background: true
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: ${{ needs.test-plan.outputs.vm-name }}
           condition: ${{ matrix.secure-boot-check }}
+        background: true
       - run: ssh root@'${{ needs.test-plan.outputs.vm-name }}' "$INPUT_COMMAND"
         if: inputs.command != ''
         env:
           INPUT_COMMAND: ${{ inputs.command }}
+        background: true
       - run: |
           if [ "$INPUT_NETWORK" = './tests/network-192-168-1.xml' ] ; then
             [[ "$IP_ADDRESS" =~ ^192\.168\.1\. ]]
@@ -140,9 +143,11 @@ jobs:
         env:
           INPUT_NETWORK: ${{ matrix.network }}
           IP_ADDRESS: ${{ steps.run-machine.outputs.ip-address }}
+        background: true
       - run: |
           diff <( ssh root@'${{ needs.test-plan.outputs.vm-name }}' 'mkdir /mnt/host-dir && mount -t virtiofs host-dir /mnt/host-dir && cat /mnt/host-dir/hostname' ) /etc/hostname
         if: matrix.virtiofs-test == 'test'
+        background: true
       - run: |
           virsh --connect qemu:///session dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath '/domain/devices/vsock' -
           VSOCK=$( virsh --connect qemu:///session dumpxml '${{ needs.test-plan.outputs.vm-name }}' | xmllint --xpath 'string(/domain/devices/vsock/cid/@address)' - )
@@ -150,6 +155,8 @@ jobs:
           [ -f /etc/ssh/ssh_config.d/20-systemd-ssh-proxy.conf ] || ssh_opts+=( -o "ProxyCommand=socat - VSOCK-CONNECT:$VSOCK:22" )
           ssh "${ssh_opts[@]}" root@vsock%$VSOCK cat /etc/hostname
         if: matrix.vsock-ssh-test == 'test'
+        background: true
+      - wait-all:
 
       - run: |
           virsh --connect qemu:///session destroy '${{ needs.test-plan.outputs.vm-name }}'
@@ -216,8 +223,11 @@ jobs:
           ssh root@'${{ needs.test-plan.outputs.vm-name }}' "ssh -o 'StrictHostKeyChecking accept-new' root@'${{ steps.run-machine-2.outputs.ip-address }}' ip a"
         shell: bash -euxo pipefail {0}
         if: matrix.second-machine == 'multihost'
+        background: true
       - uses: ./.github/actions/secure-boot-check
         with:
           vm-name: ${{ needs.test-plan.outputs.vm-name-2 }}
           condition: ${{ matrix.secure-boot-check }}
         if: matrix.second-machine == 'multihost'
+        background: true
+      - wait-all:
