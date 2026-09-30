@@ -45,7 +45,7 @@ jobs:
           git commit -m "$COMMIT_MESSAGE"
           git push origin "$BRANCH:$BRANCH"
 
-          echo '{ "head": "'"$BRANCH"'", "base": "master", "title": "'"$COMMIT_MESSAGE"'", "body": "Update the osinfo documentation, capture the up-to-date list of short-ids and/or remove distributions that went EOL." }' \
+          echo '{ "head": "'"$BRANCH"'", "base": "osinfo-test", "title": "'"$COMMIT_MESSAGE"'", "body": "Update the osinfo documentation, capture the up-to-date list of short-ids and/or remove distributions that went EOL." }' \
           | tee /dev/stderr \
           | curl -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
