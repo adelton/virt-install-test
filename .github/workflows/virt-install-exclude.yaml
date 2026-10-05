@@ -5,6 +5,10 @@ on:
       - '*'
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
 jobs:
   test-plan:
     name: Generate test plan
@@ -24,7 +28,6 @@ jobs:
               | tee .github/virt-install.json \
               | ( echo -n 'matrix-run=' >> $GITHUB_OUTPUT ; tee -a $GITHUB_OUTPUT )
           jq -sr -L ci -f ./ci/test-matrix-to-html.jq < .github/virt-install.json >> $GITHUB_STEP_SUMMARY
-        shell: bash -euxo pipefail {0}
   virt-install:
     runs-on: ${{ matrix.runs-on }}
     needs: [ test-plan ]

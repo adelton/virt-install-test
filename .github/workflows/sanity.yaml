@@ -6,6 +6,11 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '5 3 * * 1'
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
 jobs:
   catch-unsafe-vm-name:
     runs-on: ubuntu-latest

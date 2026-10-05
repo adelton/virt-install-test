@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: '12 3 * * 1'
 
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
 jobs:
   virt-install-defaults:
     runs-on: ${{ matrix.runs-on }}

@@ -43,6 +43,10 @@ on:
   schedule:
     - cron: '15 3 * * 1'
 
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
 jobs:
   test-plan:
     name: Generate test plan
@@ -57,6 +61,7 @@ jobs:
       - uses: actions/checkout@v6
       - id: produce-matrix
         run: |
+          set -x
           if [ -n "$INPUT_DISK_URL" ] ; then
               [ "$INPUT_ARCH" == '(guess)' ] && INPUT_ARCH=
               cat <<EOS | tee /dev/stderr | yq . -o json -
@@ -88,7 +93,6 @@ jobs:
               VM_NAME2="$INPUT_VM_NAME-2"
           fi
           echo "vm-name-2=$VM_NAME2" >> $GITHUB_OUTPUT
-        shell: bash -euxo pipefail {0}
         env:
           INPUT_DISK_URL: ${{ inputs.disk-url }}
           INPUT_ARCH: ${{ inputs.arch }}
@@ -220,10 +224,10 @@ jobs:
           virt-customize: ${{ matrix.virt-customize }}
         if: matrix.second-machine == 'multihost'
       - run: |
+          set -x
           ssh "root@$VM_NAME" 'ssh-keygen -N "" -f ~/.ssh/id_rsa'
           ssh "root@$VM_NAME" 'cat ~/.ssh/id_rsa.pub' | ssh "root@$VM_NAME_2" 'umask 077 && cat > ~/.ssh/authorized_keys'
           ssh "root@$VM_NAME" "ssh -o 'StrictHostKeyChecking accept-new' root@$IP_ADDRESS_2 ip a"
-        shell: bash -euxo pipefail {0}
         if: matrix.second-machine == 'multihost'
         env:
           VM_NAME_2: ${{ needs.test-plan.outputs.vm-name-2 }}

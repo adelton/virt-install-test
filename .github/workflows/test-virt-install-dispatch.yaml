@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: '10 3 * * 1'
 
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
 jobs:
   test-dispatch:
     name: Dispatch
