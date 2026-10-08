@@ -207,6 +207,8 @@ runs:
           --disk virt-install-images/"$INPUT_VM_NAME".qcow2 \
           --disk path=virt-install-images/"$INPUT_VM_NAME"-cloud-init.iso,device=cdrom \
           --osinfo "$INPUT_OSINFO" \
+          --serial pty,log.file=/tmp/"$INPUT_VM_NAME".serial.log,log.append=off \
+          --tpm none \
           "${args[@]}"
         )
         echo '::group::domain XML'
@@ -229,6 +231,24 @@ runs:
         LIBVIRT_DEFAULT_URI: qemu:///session
       shell: |
         bash -euo pipefail -c "echo ::group::output of: virsh start ${{ inputs.vm-name }} --console ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
+    - run: |
+        virsh domstate --reason "$INPUT_VM_NAME"
+        virsh domstats --cpu-total --vcpu "$INPUT_VM_NAME"; sleep 5; virsh domstats --cpu-total "$INPUT_VM_NAME"
+        virsh qemu-monitor-command "$INPUT_VM_NAME" --hmp 'info chardev'
+        virsh dumpxml "$INPUT_VM_NAME" | grep -E "<domain type|<loader|<os|<serial|<log"
+        cat ~/.cache/libvirt/qemu/log/"$INPUT_VM_NAME".log
+        ls -l /tmp/*.serial.log virt-install-images/ virt-install-images/base/
+        cat -v /tmp/"$INPUT_VM_NAME".serial.log
+        file virt-install-images/base/*
+        virsh domstats --vcpu "$INPUT_VM_NAME" | grep -E 'exits.sum|halt_exits'; sleep 5
+        virsh domstats --vcpu "$INPUT_VM_NAME" | grep -E 'exits.sum|halt_exits'
+        virsh qemu-monitor-command "$INPUT_VM_NAME" --hmp 'info registers' | head -25 ; sleep 5
+        virsh qemu-monitor-command "$INPUT_VM_NAME" --hmp 'info registers' | head -25
+      env:
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
+        LIBVIRT_DEFAULT_URI: qemu:///session
+      shell: bash -x {0}
+      if: success() || failure()
     - run: |
         MAC=$( virsh --connect qemu:///session dumpxml "$INPUT_VM_NAME" | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
         IP=
