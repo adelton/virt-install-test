@@ -36,6 +36,7 @@ virt-install:
     - multihost
 
   args:
+    - --tpm default
   virtiofs-test: no
   vsock-ssh-test: no
 
