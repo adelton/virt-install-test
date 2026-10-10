@@ -65,6 +65,11 @@ After creating the virtual machine, the action will
 - SSH to the VM as root to test the setup;
 - set the `ip-address` output.
 
+The `virt-install` command is run with `--tpm none` by default
+as the default emulated TPM was introducing significant slowdown
+on the runners where this action was tested. If you need TPM,
+enable it with the `args` input.
+
 ## Inputs
 
 See what [values and their combinations](.github/virt-install-params.yaml)
