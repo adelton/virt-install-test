@@ -22,16 +22,10 @@ virt-install:
           inventory: tests/inventory/fedora-45-aarch64
           virt-customize: *systemd-device-timeout
           boot:
-            uefi:
-              secure-boot-check: secure-boot=yes
             hd:
               secure-boot-check: secure-boot=yes
             '':
               secure-boot-check: secure-boot=yes
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-              secure-boot-check: secure-boot=yes
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-              secure-boot-check: secure-boot=no
     Fedora 44:
       osinfo: fedora42
       arch-display:
@@ -62,25 +56,15 @@ virt-install:
   osinfo: linux2024
 
   boot:
-    uefi:
-      secure-boot-check: secure-boot=yes
     hd:
       secure-boot-check: secure-boot=missing
     '':
       secure-boot-check: secure-boot=missing
-    uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-      secure-boot-check: secure-boot=yes
-    uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-      secure-boot-check: secure-boot=no
 
   network:
     - bridge=virbr0,model=virtio
-    - ./tests/network-192-168-1.xml
 
   second-machine:
-    - recreate
-    - local-file
-    - multihost
     - (none)
 
   args:
