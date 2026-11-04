@@ -59,6 +59,8 @@ virt-install:
       --memorybacking access.mode=shared
       --filesystem source=/etc,target=host-dir,driver.type=virtiofs
       --vsock cid.auto=yes
+      --memory 2000
+      --machine pc-i440fx-noble-v2
   virtiofs-test: test
   vsock-ssh-test: test
 
