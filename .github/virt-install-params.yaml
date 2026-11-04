@@ -2,7 +2,6 @@
 virt-install:
   name:
     AlmaLinux 10.2:
-      osinfo: almalinux10
       arch-display:
         x86_64:
           disk-url: https://repo.almalinux.org/almalinux/10.2/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.2-20260526.0.x86_64.qcow2
@@ -22,7 +21,6 @@ virt-install:
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
               secure-boot-check: secure-boot=no
     AlmaLinux 10.2 (with TPM):
-      osinfo: almalinux10
       arch-display: x86_64
       disk-url: https://repo.almalinux.org/almalinux/10.2/cloud/x86_64/images/AlmaLinux-10-GenericCloud-10.2-20260526.0.x86_64.qcow2
       inventory: tests/inventory/almalinux-10-x86_64
@@ -33,7 +31,6 @@ virt-install:
         --filesystem source=/etc,target=host-dir,driver.type=virtiofs
         --vsock cid.auto=yes
     Fedora 44 (no cloud-init):
-      osinfo: fedora42
       arch-display:
         x86_64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/44/Server/x86_64/images/Fedora-Server-Guest-Generic-44-1.7.x86_64.qcow2
@@ -58,7 +55,6 @@ virt-install:
         --no-selinux-relabel
       vsock-ssh-test: no
     Fedora 44:
-      osinfo: fedora42
       arch-display:
         x86_64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-44-1.7.x86_64.qcow2
@@ -78,20 +74,6 @@ virt-install:
           inventory: tests/inventory/fedora-44-aarch64
           virt-customize: *systemd-device-timeout
     Fedora 43:
-      osinfo:
-        fedora42:
-        generic:
-          boot:
-            uefi:
-              secure-boot-check: secure-boot=no
-            hd:
-              secure-boot-check: secure-boot=missing
-            '':
-              secure-boot-check: secure-boot=missing
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-              secure-boot-check: secure-boot=excluded
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
-              secure-boot-check: secure-boot=no
       arch-display:
         x86_64:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
@@ -109,7 +91,6 @@ virt-install:
           virt-customize: *systemd-device-timeout
       vsock-ssh-test: no
     Ubuntu 26.04:
-      osinfo: ubuntu24.04
       arch-display:
         x86_64:
           disk-url:
@@ -132,7 +113,6 @@ virt-install:
             <<: *boot-hd-also-secure-boot
           virt-customize: *systemd-device-timeout
     Debian 13:
-      osinfo: debian13
       arch-display:
         x86_64:
           disk-url: https://cloud.debian.org/images/cloud/trixie/20260518-2482/debian-13-genericcloud-amd64-20260518-2482.qcow2
@@ -144,7 +124,6 @@ virt-install:
             <<: *boot-hd-also-secure-boot
       vsock-ssh-test: no
     Arch Linux latest:
-      osinfo: archlinux
       arch-display: x86_64
       disk-url: https://fastly.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2
       inventory: tests/inventory/arch-linux-latest-x86_64
@@ -163,7 +142,6 @@ virt-install:
         ubuntu-24.04-arm:
           virt-customize: *serial-getty-systemd-device-timeout
     Alpine Linux 3.23:
-      osinfo: alpinelinux3.21
       arch-display:
         x86_64:
           disk-url: https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.3-x86_64-uefi-cloudinit-r0.qcow2
@@ -175,7 +153,6 @@ virt-install:
         --edit '/etc/shadow:s/^root:!\*:/root:*:/'
       vsock-ssh-test: no
     openSUSE Tumbleweed:
-      osinfo: opensusetumbleweed
       arch-display:
         x86_64:
           disk-url: https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2
@@ -209,7 +186,9 @@ virt-install:
     - ubuntu-24.04
     - ubuntu-24.04-arm
 
-  osinfo: linux2024
+  osinfo:
+    - generic
+    - linux2024
 
   boot:
     uefi:
