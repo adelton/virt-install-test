@@ -20,13 +20,11 @@ virt-install:
           disk-url: https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2
           inventory: tests/inventory/fedora-43-x86_64
           runs-on:
-            ubuntu-26.04:
             ubuntu-26.04-arm:
               virt-customize: &systemd-device-timeout >
                 --mkdir /etc/systemd/system.conf.d
                 --copy-in tests/systemd-device-timeout.conf:/etc/systemd/system.conf.d
                 --no-selinux-relabel
-            ubuntu-24.04:
             ubuntu-24.04-arm:
               virt-customize: *systemd-device-timeout
         aarch64:
@@ -36,9 +34,7 @@ virt-install:
       vsock-ssh-test: no
 
   runs-on:
-    - ubuntu-26.04
     - ubuntu-26.04-arm
-    - ubuntu-24.04
     - ubuntu-24.04-arm
 
   osinfo: linux2024
