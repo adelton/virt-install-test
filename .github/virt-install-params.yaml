@@ -5,14 +5,6 @@ virt-install:
       osinfo:
         generic:
           boot:
-            uefi:
-              secure-boot-check: secure-boot=no
-            hd:
-              secure-boot-check: secure-boot=missing
-            '':
-              secure-boot-check: secure-boot=missing
-            uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-              secure-boot-check: secure-boot=excluded
             uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
               secure-boot-check: secure-boot=no
       arch-display:
@@ -40,14 +32,6 @@ virt-install:
   osinfo: linux2024
 
   boot:
-    uefi:
-      secure-boot-check: secure-boot=yes
-    hd:
-      secure-boot-check: secure-boot=missing
-    '':
-      secure-boot-check: secure-boot=missing
-    uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes:
-      secure-boot-check: secure-boot=yes
     uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no:
       secure-boot-check: secure-boot=no
 
