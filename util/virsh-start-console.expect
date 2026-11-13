@@ -28,7 +28,7 @@ expect {
 		}
 	}
 	-re {.\n} {
-		if {[clock seconds] - $start >= 600} { puts "Waiting for login prompt timed out." ; exit 1 }
+		if {[clock seconds] - $start >= 1200} { puts "Waiting for login prompt timed out." ; exit 1 }
 		exp_continue
 	}
 }
