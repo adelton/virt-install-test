@@ -16,8 +16,8 @@ virt-install:
               virt-customize: &systemd-device-timeout >
                 --mkdir /etc/systemd/system.conf.d
                 --copy-in tests/systemd-device-timeout.conf:/etc/systemd/system.conf.d
-                --mkdir /etc/systemd/system/cloud-final.service.d
-                --copy-in tests/before-getty.conf:/etc/systemd/system/cloud-final.service.d
+                --mkdir /etc/systemd/system/serial-getty@.service.d
+                --copy-in tests/after-cloud-final.conf:/etc/systemd/system/serial-getty@.service.d
                 --no-selinux-relabel
             ubuntu-24.04-arm:
               virt-customize: *systemd-device-timeout
