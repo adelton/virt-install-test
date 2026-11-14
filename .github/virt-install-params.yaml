@@ -208,9 +208,6 @@ virt-install:
       network: ./tests/network-192-168-1.xml
       virt-customize: >
         --edit '/etc/rc.local:s%^exit 0%ping -c1 192.168.1.254\necho "Booted, ready for login:" > /dev/console%'
-      second-machine:
-        - recreate
-        - local-file
       virtiofs-test: no
       vsock-ssh-test: no
 
@@ -239,9 +236,6 @@ virt-install:
     - ./tests/network-192-168-1.xml
 
   second-machine:
-    - recreate
-    - local-file
-    - multihost
     - (none)
 
   args:

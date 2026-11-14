@@ -230,6 +230,18 @@ runs:
       shell: |
         bash -euo pipefail -c "echo ::group::output of: virsh start ${{ inputs.vm-name }} --console ; trap 'echo ::endgroup::' exit ; bash -euo pipefail {0}"
     - run: |
+        # virsh domifaddr "$INPUT_VM_NAME" --source arp
+        MAC=$( virsh --connect qemu:///session dumpxml "$INPUT_VM_NAME" | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
+        for i in arp ; do virsh domifaddr "$INPUT_VM_NAME" --full --source $i ; done
+        sleep 10
+        for i in arp ; do virsh domifaddr "$INPUT_VM_NAME" --full --source $i ; done
+        sleep 30
+        for i in arp ; do virsh domifaddr "$INPUT_VM_NAME" --full --source $i ; done | tee /dev/stderr | grep "$MAC"
+      env:
+        INPUT_VM_NAME: ${{ inputs.vm-name }}
+        LIBVIRT_DEFAULT_URI: qemu:///session
+      shell: bash -x {0}
+    - run: |
         MAC=$( virsh --connect qemu:///session dumpxml "$INPUT_VM_NAME" | xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - )
         IP=
         while read n ; do
