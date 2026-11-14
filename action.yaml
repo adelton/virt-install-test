@@ -14,7 +14,7 @@ inputs:
     default: generic
   network:
     description: Space-separated values for virt-install --network arguments
-    default: bridge=virbr0,model=virtio
+    default: bridge=virbr0
   args:
     description: Generic virt-install arguments
   virt-customize:

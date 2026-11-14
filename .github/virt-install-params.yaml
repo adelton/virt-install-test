@@ -235,7 +235,7 @@ virt-install:
       secure-boot-check: secure-boot=no
 
   network:
-    - bridge=virbr0,model=virtio
+    - bridge=virbr0
     - ./tests/network-192-168-1.xml
 
   second-machine:
